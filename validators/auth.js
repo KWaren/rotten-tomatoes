@@ -1,5 +1,5 @@
-// /validators/auth.ts
-import { z } from 'zod';
+// /validators/auth.js
+import { z } from "zod";
 
 export const registerSchema = z.object({
   email: z.string().min(1).email(),
@@ -10,10 +10,7 @@ export const registerSchema = z.object({
   birthday: z.string().optional(),
 });
 
-export type RegisterInput = z.infer<typeof registerSchema>;
-
 export const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
 });
-export type LoginInput = z.infer<typeof loginSchema>;
