@@ -23,7 +23,9 @@ function calculateAge(birthdayString) {
 // Fonction pour déterminer la tranche d'âge
 function getAgeGroup(age) {
   if (age === null) return "Unknown";
-  if (age < 18) return "Under 18";
+  if (age < 3) return "Under 3";
+  if (age < 13) return "3-12";
+  if (age < 18) return "13-17";
   if (age < 26) return "18-25";
   if (age < 36) return "26-35";
   if (age < 46) return "36-45";
@@ -82,7 +84,7 @@ export async function GET(request) {
         ratings: {
           include: {
             movie: {
-              select: { id: true, title: true, genre: true, posterUrl: true },
+              select: { id: true, title: true, genres: true, posterUrl: true },
             },
           },
         },
@@ -106,7 +108,7 @@ export async function GET(request) {
           moviesByAgeGroup[ageGroup][movieId] = {
             id: movieId,
             title: rating.movie.title,
-            genre: rating.movie.genre,
+            genres: rating.movie.genres,
             posterUrl: rating.movie.posterUrl,
             scores: [],
           };
