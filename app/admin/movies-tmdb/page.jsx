@@ -1,13 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  get_genres,
+  get_movies_by_genre,
+  search_movies,
+  get_popular_movies,
+} from "@/lib/tmdb";
 import MovieList from "@/components/movie/MovieList";
 import FilterBar from "@/components/movie/filterBar";
 import Link from "next/link";
 
 export default function MoviesPage() {
   const [movies, setMovies] = useState([]);
-  const [allMovies, setAllMovies] = useState([]);
   const [genres, setGenres] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -17,85 +22,81 @@ export default function MoviesPage() {
   const [sortBy, setSortBy] = useState("popularity.desc");
 
   useEffect(() => {
-    const loadMovies = async () => {
+    const loadGenres = async () => {
       try {
-        const res = await fetch("/api/movies?limit=1000");
-        const data = await res.json();
-        setAllMovies(data.movies || []);
-        
-        const uniqueGenres = [...new Set(data.movies.map(m => m.genre).filter(Boolean))];
-        setGenres(uniqueGenres.map((name, index) => ({ id: index + 1, name })));
+        const genresList = await get_genres();
+        setGenres(genresList);
       } catch (error) {
-        console.error("Error while loading movies:", error);
-        setAllMovies([]);
+        console.error("Erreur lors du chargement des genres:", error);
       }
     };
-    loadMovies();
+    loadGenres();
   }, []);
 
   useEffect(() => {
     setLoading(true);
 
-    const filterMovies = () => {
-      let filteredMovies = [...allMovies];
+    const fetchMovies = async () => {
+      try {
+        let data;
 
-      if (searchQuery.trim()) {
-        filteredMovies = filteredMovies.filter((movie) =>
-          movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          movie.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          movie.director?.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        if (searchQuery.trim()) {
+          data = await search_movies(searchQuery, 1);
+        }
+        else if (selectedGenre) {
+          data = await get_movies_by_genre(selectedGenre, 1);
+        }
+        else {
+          data = await get_popular_movies(1);
+        }
+
+        let filteredMovies = data.results;
+
+        if (selectedYear) {
+          filteredMovies = filteredMovies.filter((movie) => {
+            const movieYear = new Date(movie.release_date).getFullYear();
+            return movieYear === selectedYear;
+          });
+        }
+
+        filteredMovies = sortMovies(filteredMovies, sortBy);
+
+        setMovies(filteredMovies);
+      } catch (error) {
+        console.error("Error while fetching movies:", error);
+        setMovies([]);
+      } finally {
+        setLoading(false);
       }
-
-      if (selectedGenre) {
-        const genreName = genres.find(g => g.id === selectedGenre)?.name;
-        filteredMovies = filteredMovies.filter((movie) =>
-          movie.genre === genreName
-        );
-      }
-
-      if (selectedYear) {
-        filteredMovies = filteredMovies.filter((movie) => {
-          const movieYear = movie.releaseDate
-            ? new Date(movie.releaseDate).getFullYear()
-            : null;
-          return movieYear === selectedYear;
-        });
-      }
-
-      filteredMovies = sortMovies(filteredMovies, sortBy);
-
-      setMovies(filteredMovies);
-      setLoading(false);
     };
 
-    const timer = setTimeout(filterMovies, 300);
+    const timer = setTimeout(fetchMovies, 300);
     return () => clearTimeout(timer);
-  }, [allMovies, selectedGenre, selectedYear, searchQuery, sortBy, genres]);
+  }, [selectedGenre, selectedYear, searchQuery, sortBy]);
 
   const sortMovies = (moviesList, sortOption) => {
     const sorted = [...moviesList];
 
     switch (sortOption) {
       case "popularity.desc":
-        return sorted.sort((a, b) => (b._count?.favorites || 0) - (a._count?.favorites || 0));
+        return sorted.sort((a, b) => b.popularity - a.popularity);
       case "popularity.asc":
-        return sorted.sort((a, b) => (a._count?.favorites || 0) - (b._count?.favorites || 0));
+        return sorted.sort((a, b) => a.popularity - b.popularity);
       case "vote_average.desc":
-        return sorted.sort((a, b) => (b._count?.ratings || 0) - (a._count?.ratings || 0));
+        return sorted.sort((a, b) => b.vote_average - a.vote_average);
       case "vote_average.asc":
-        return sorted.sort((a, b) => (a._count?.ratings || 0) - (b._count?.ratings || 0));
+        return sorted.sort((a, b) => a.vote_average - b.vote_average);
       case "release_date.desc":
         return sorted.sort(
           (a, b) =>
-            new Date(b.releaseDate || 0).getTime() -
-            new Date(a.releaseDate || 0).getTime()
+            new Date(b.release_date).getTime() -
+            new Date(a.release_date).getTime()
         );
       case "release_date.asc":
         return sorted.sort(
           (a, b) =>
-            new Date(a.releaseDate || 0).getTime() -
-            new Date(b.releaseDate || 0).getTime()
+            new Date(a.release_date).getTime() -
+            new Date(b.release_date).getTime()
         );
       case "title.asc":
         return sorted.sort((a, b) => a.title.localeCompare(b.title));
@@ -181,8 +182,8 @@ export default function MoviesPage() {
               <MovieList
                 movies={movies}
                 title={searchQuery ? `Result for "${searchQuery}"` : undefined}
-                variant="user"
-                basePath="/movies"
+                variant="admin"
+                basePath="/admin/movies-tmdb"
               />
             )}
           </div>

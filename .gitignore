@@ -42,3 +42,8 @@ next-env.d.ts
 
 /app/generated/prisma
 tsconfig.json
+
+# Autres
+/scripts
+/docs
+.vscode/
