@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("ACCELERATE_URL")
 }
 
 model User {
@@ -32,18 +32,32 @@ model User {
 
 
 model Movie {
-  id          Int        @id @default(autoincrement())
-  title       String
-  description String
-  posterUrl   String?
-  releaseDate DateTime?
-  director    String?
-  genre       String
-  ratings     Rating[]
-  comments    Comment[]
-  favorites   Favorite[]
-  createdAt DateTime @default(now())
-
+  id              Int        @id @default(autoincrement())
+  tmdbId          Int?       @unique
+  title           String
+  originalTitle   String?
+  description     String     @db.Text
+  tagline         String?
+  posterUrl       String?
+  backdropUrl     String?
+  releaseDate     DateTime?
+  director        String?
+  genres          String[]
+  runtime         Int?
+  status          String?
+  voteAverage     Float?
+  voteCount       Int?
+  budget          BigInt?
+  revenue         BigInt?
+  homepage        String?
+  originalLanguage String?
+  cast            Json?
+  crew            Json?
+  ratings         Rating[]
+  comments        Comment[]
+  favorites       Favorite[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
 }
 
 model Favorite {
