@@ -1,4 +1,3 @@
-
 # ‧ 🍒 ⋅ ˚✮ My Rotten Tomatoes
 
 A platform dedicated to reviews and information about the films a bit like Rotten Tomatoes
@@ -11,9 +10,11 @@ A platform dedicated to reviews and information about the films a bit like Rotte
   
 * **Database** – Postgres for storing users, movies, comments, favorites, rates
   
-* **Frontend** – Responsive UI built with NextJs, TypeScript, Vite, and TailwindCSS. 
+* **Admin Panel** – Import movies from TMDB API into local database
   
-* **Backend API** – NextJs, Prisma and MovieDB
+* **Frontend** – Responsive UI built with NextJs, React 19, and TailwindCSS 4
+  
+* **Backend API** – NextJs App Router, Prisma with Accelerate, and TMDB API
   
 * **Deployment Ready** – Easily deploy project with ***Vercel***
   
@@ -47,14 +48,57 @@ A platform dedicated to reviews and information about the films a bit like Rotte
    ```
     Update .env with your configuration:
 
-      * MovieDB API key
+      * **TMDB API Key** - Get yours at https://www.themoviedb.org/settings/api
+      * **Database URLs** - Configure Prisma Accelerate connection
+      * **SMTP Settings** - For email verification
+      * **JWT Secret** - For authentication tokens
+
+   Example .env:
+   ```env
+   # TMDB API
+   NEXT_PUBLIC_TMDB_API_KEY=your_api_key_here
+   NEXT_PUBLIC_TMDB_BASE_URL=https://api.themoviedb.org/3
+   NEXT_PUBLIC_TMDB_IMAGE_BASE_URL=https://image.tmdb.org/t/p
+
+   # Database (Prisma Accelerate)
+   DATABASE_URL="postgresql://user:pass@localhost:5432/db"
+   ACCELERATE_URL="prisma+postgres://accelerate.prisma-data.net/?api_key=..."
+
+   # SMTP
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your_email@gmail.com
+   SMTP_PASS=your_app_password
+
+   # JWT
+   JWT_SECRET="your_secret_key"
+   JWT_EXPIRES_IN="7d"
+   ```
   
-4. Development
+4. Database setup
+   ```bash
+   # Generate Prisma Client
+   npx prisma generate
+
+   # Run migrations
+   npx prisma migrate dev
+
+   # (Optional) Seed the database
+   npx prisma db seed
+   ```
+
+5. Development
    ```bash
     npm run dev
     ```
+   Access the app at http://localhost:3000
 
-5. Production Build
+6. Admin Import (for admins only)
+   - Navigate to http://localhost:3000/admin/movies-tmdb
+   - Click "+ ADD" to add the movie to your local database
+   - View imported movies at http://localhost:3000/admin/movies
+
+7. Production Build
     ```bash
     npm run build
     ```
@@ -88,7 +132,7 @@ A platform dedicated to reviews and information about the films a bit like Rotte
 
 ### Frontend 
 
-* Built with NextJs + tailwindCSS + TypeScript
+* Built with NextJs + tailwindCSS + JavaScript
 
 ### Backend 
 
