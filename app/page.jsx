@@ -1,12 +1,31 @@
-import { get_popular_movies, get_top_rated_movies } from "@/lib/tmdb";
 import MovieList from "@/components/movie/MovieList";
 import Link from "next/link";
 
+async function getLocalMovies() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/movies?page=1&limit=20`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch movies");
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching local movies:", error);
+    return { movies: [], total: 0 };
+  }
+}
+
 export default async function Home() {
-  const [popularMovies, topRatedMovies] = await Promise.all([
-    get_popular_movies(1),
-    get_top_rated_movies(1),
-  ]);
+  const { movies } = await getLocalMovies();
+
+  const popularMovies = movies.slice(0, 12);
+
+  // A revoir avec Gil
+  const topRatedMovies = movies.slice(0, 12);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -85,7 +104,7 @@ export default async function Home() {
               See more
             </Link>
           </div>
-          <MovieList movies={popularMovies.results.slice(0, 12)} />
+          <MovieList movies={popularMovies} variant="user" basePath="/movies" />
         </section>
 
         <section>
@@ -114,7 +133,11 @@ export default async function Home() {
               See more
             </Link>
           </div>
-          <MovieList movies={topRatedMovies.results.slice(0, 12)} />
+          <MovieList
+            movies={topRatedMovies}
+            variant="user"
+            basePath="/movies"
+          />
         </section>
       </main>
 
