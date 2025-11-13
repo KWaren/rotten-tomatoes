@@ -27,7 +27,7 @@ export async function POST(request) {
     }
 
     const movieResponse = await fetch(
-      `${TMDB_BASE_URL}/movie/${tmdbId}?api_key=${TMDB_API_KEY}&language=fr-FR`,
+      `${TMDB_BASE_URL}/movie/${tmdbId}?api_key=${TMDB_API_KEY}&language=en-US`,
       {
         signal: AbortSignal.timeout(10000),
       }
@@ -153,8 +153,7 @@ export async function POST(request) {
     if (error.cause?.code === "ENOTFOUND") {
       return NextResponse.json(
         {
-          error:
-            "Unable to contact TMDB API. Check your connection.",
+          error: "Unable to contact TMDB API. Check your connection.",
         },
         { status: 503 }
       );
