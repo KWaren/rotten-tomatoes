@@ -69,7 +69,7 @@ export default function MoviesPage() {
       setLoading(false);
     };
 
-    const timer = setTimeout(filterMovies, 300);
+    const timer = setTimeout(filterMovies, 10000);
     return () => clearTimeout(timer);
   }, [allMovies, selectedGenre, selectedYear, searchQuery, sortBy, genres]);
 

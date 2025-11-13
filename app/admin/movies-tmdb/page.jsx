@@ -70,7 +70,7 @@ export default function MoviesPage() {
       }
     };
 
-    const timer = setTimeout(fetchMovies, 300);
+    const timer = setTimeout(fetchMovies, 10000);
     return () => clearTimeout(timer);
   }, [selectedGenre, selectedYear, searchQuery, sortBy]);
 

@@ -56,7 +56,7 @@ export default function MovieCard({
 
       if (response.ok) {
         setImported(true);
-        setTimeout(() => setImported(false), 3000);
+        setTimeout(() => setImported(false), 10000);
       } else {
         alert(`Error: ${data.error}`);
       }
