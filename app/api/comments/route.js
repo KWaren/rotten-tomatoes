@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import {
   createComment,
   getCommentsByMovie,
+  getCommentsByUser,
 } from '@/lib/comments';
 
 // GET /api/comments?movieId=123
@@ -10,7 +11,14 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const movieId = parseInt(searchParams.get('movieId'));
 
-    if (!movieId) {
+    if (!movieId) {// get connected user 
+        const authUserId = 2;
+        
+        if (authUserId) {
+            const comments = await getCommentsByUser(authUserId);
+            return NextResponse.json({ data: comments });
+        }
+        
       return NextResponse.json({ error: 'movieId query parameter is required' }, { status: 400 });
     }
 
