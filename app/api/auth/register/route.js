@@ -1,25 +1,22 @@
-// /app/api/auth/register/route.js
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { registerSchema } from "@/validators/auth";
-import bcrypt from "bcrypt";
-import { v4 as uuidv4 } from "uuid";
-import { sendVerificationEmail } from "@/lib/mailer";
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { registerSchema } from '@/validators/auth';
+import bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
+import { sendVerificationEmail } from '@/lib/mailer';
 
 export async function POST(req) {
   try {
     const body = await req.json();
     const parsed = registerSchema.parse(body);
 
-    // check existing
+    // Vérifier si l'utilisateur existe déjà
     const existing = await prisma.user.findUnique({
       where: { email: parsed.email },
     });
-    if (existing)
-      return NextResponse.json(
-        { error: "Email already in use" },
-        { status: 409 }
-      );
+    if (existing) {
+      return NextResponse.json({ error: 'Email already in use' }, { status: 409 });
+    }
 
     const hashed = await bcrypt.hash(parsed.password, 12);
     const verificationToken = uuidv4();
@@ -41,7 +38,7 @@ export async function POST(req) {
       select: { id: true, email: true, verified: true },
     });
 
-    // send mail (async)
+    // Envoi du mail de vérification (asynchrone)
     await sendVerificationEmail(user.email, verificationToken);
 
     return NextResponse.json(
@@ -49,10 +46,10 @@ export async function POST(req) {
       { status: 201 }
     );
   } catch (err) {
-    if (err?.name === "ZodError") {
+    if (err?.name === 'ZodError') {
       return NextResponse.json({ error: err.errors }, { status: 422 });
     }
     console.error(err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
