@@ -28,7 +28,7 @@ export default function ConfirmDeleteModal({ onClose, onConfirm }) {
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="size-20"
+            className="size-20"
           >
             <path
               stroke-linecap="round"
