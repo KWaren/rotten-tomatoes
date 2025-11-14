@@ -44,7 +44,7 @@ export default function LoginForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="bg-red-100 border rounded-lg border-red-400 text-red-700  bg-white/90 px-4 py-3 rounded relative mt-4" role="alert">
+            <div className="bg-red-100 border rounded-lg border-red-400 text-red-700  px-4 py-3 relative mt-4" role="alert">
               <strong className="font-bold">Error :</strong>
               <span className="block sm:inline ml-1">{error}</span>
             </div>
@@ -83,10 +83,10 @@ export default function LoginForm() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 mt-4">
+        <p className="text-center text-sm text-white mt-4">
           Don’t have an account?{' '}
           <Link href="/register" className="text-red-500 hover:underline font-medium">
-            Create one
+            Sign up
           </Link>
         </p>
       </div>
