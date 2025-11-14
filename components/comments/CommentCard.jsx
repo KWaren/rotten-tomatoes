@@ -34,14 +34,23 @@ export default function CommentCard({
             Posted <i>{timeAgo(comment.createdAt)}</i> on{" "}
             {formatDateToMonthYear(comment.createdAt)}
           </div>
-          <h2 className="text-bold text-red-600 font-bold text-lg">
-            <span className="text-gray-500 text-xs">
+          <h2 className="text-red-600 font-bold text-lg">
+            <span className="text-gray-500 text-xs font-normal">
               <i>by </i>
             </span>
             {author}
           </h2>
-          {isOwner && (
-          <div className="flex gap-2 items-center">
+
+        </div>
+        
+      </div>
+      <div className="mt-2 text-gray-700 dark:text-gray-300">
+        
+        <div className="whitespace-pre-wrap wrap-break-word max-w-full md:ml-16 shadow-lg bg-gray-800 p-2">
+              {comment.content}
+        </div>
+                  {isOwner && (
+          <div className="flex gap-2 items-center justify-end">
             <button
               className="text-sm text-white inline-flex items-center cursor-pointer gap-2 rounded-full hover:bg-neutral-400 py-1.5 hover:px-3"
               onClick={() => setEditModalOpen(true)}
@@ -86,15 +95,6 @@ export default function CommentCard({
             </button>
           </div>
         )}
-
-        </div>
-        
-      </div>
-      <div className="mt-2 text-gray-700 dark:text-gray-300">
-        
-        <div className="whitespace-pre-wrap wrap-break-word max-w-full">
-              {comment.content}
-            </div>
       </div>
 
       {isEditModalOpen && (
