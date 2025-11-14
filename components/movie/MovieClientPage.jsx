@@ -68,7 +68,19 @@ export default function MovieClientPage({ movie }) {
           >
             Back
           </Link>
+          {movie.voteAverage && (
+            <span className="ml-4 inline-flex items-center gap-1 bg-black/50 text-white px-3 py-2 rounded-lg text-sm">
+              ⭐ {movie.voteAverage.toFixed(1)}
+            </span>
+          )}
+          {movie.voteCount && (
+            <span className="ml-2 inline-flex items-center gap-1 bg-black/50 text-white px-3 py-2 rounded-lg text-sm">
+              {movie.voteCount.toLocaleString()} votes
+            </span>
+          )}
         </div>
+
+        {/*Rate for the movie from our DB*/}
       </div>
 
       <main className="container mx-auto px-4 -mt-32 md:-mt-48 relative z-10 pb-12">
