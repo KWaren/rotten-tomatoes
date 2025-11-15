@@ -2,6 +2,7 @@ import { get_popular_movies, get_top_rated_movies } from "@/lib/tmdb";
 import MovieList from "@/components/movie/MovieList";
 import Link from "next/link";
 import logo from "../../public/Logo.png";
+import Image from "next/image";
 
 export default async function Home() {
   const [popularMovies, topRatedMovies] = await Promise.all([

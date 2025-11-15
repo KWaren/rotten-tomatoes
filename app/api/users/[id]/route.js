@@ -60,10 +60,7 @@ export async function PUT(req, context) {
     return NextResponse.json(user);
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Error updating user" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error updating user" }, { status: 500 });
   }
 }
 
@@ -83,9 +80,6 @@ export async function DELETE(req, context) {
     return NextResponse.json({ message: "User deleted successfully" });
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Error deleting user" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error deleting user" }, { status: 500 });
   }
 }

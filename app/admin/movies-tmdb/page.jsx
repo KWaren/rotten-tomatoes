@@ -11,6 +11,7 @@ import {
 import MovieList from "@/components/movie/MovieList";
 import FilterBar from "@/components/movie/filterBar";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function MoviesPage() {
   const [movies, setMovies] = useState([]);

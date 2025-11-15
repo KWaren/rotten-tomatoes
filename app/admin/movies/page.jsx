@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import logo from "../../public/Logo.png";
+import logo from "../../../public/Logo.png";
 
 export default function AdminMoviesListPage() {
   const [movies, setMovies] = useState([]);

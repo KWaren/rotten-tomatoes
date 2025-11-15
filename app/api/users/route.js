@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prismaDirect } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 
-// GET /api/users → liste tous les utilisateurs
+// GET /api/users : liste tous les utilisateurs
 export async function GET() {
   try {
     const users = await prismaDirect.user.findMany({
@@ -21,11 +21,14 @@ export async function GET() {
     return NextResponse.json(users);
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Error fetching users" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error fetching users" },
+      { status: 500 }
+    );
   }
 }
 
-// POST /api/users → créer un utilisateur (admin)
+// POST /api/users : créer un utilisateur (admin)
 export async function POST(req) {
   try {
     const body = await req.json();

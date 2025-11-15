@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
 import UpdateUserModal from "@/components/users/UpdateUserModal";
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export default function UsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,22 +13,22 @@ export default function UsersPage() {
   };
 
   const [users, setUsers] = useState([]);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [errors, setErrors] = useState([]);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
   const [showAddModal, setShowAddModal] = useState(false);
 
   // Fields for new user
   const [newUser, setNewUser] = useState({
-    name: '',
-    surname: '',
-    email: '',
-    password: '',
-    role: 'USER',
+    name: "",
+    surname: "",
+    email: "",
+    password: "",
+    role: "USER",
     verified: false,
   });
 
@@ -36,17 +36,17 @@ export default function UsersPage() {
   useEffect(() => {
     async function loadUsers() {
       try {
-        const res = await fetch('/api/users');
+        const res = await fetch("/api/users");
         const data = await res.json();
 
         if (Array.isArray(data)) {
           setUsers(data);
         } else {
-          setErrors(['Failed to load users']);
+          setErrors(["Failed to load users"]);
         }
       } catch (err) {
         console.error(err);
-        setErrors(['An error occurred while loading users']);
+        setErrors(["An error occurred while loading users"]);
       }
     }
     loadUsers();
@@ -56,18 +56,18 @@ export default function UsersPage() {
   const createUser = async (e) => {
     e.preventDefault();
     setErrors([]);
-    setMessage('');
+    setMessage("");
 
     try {
-      const res = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),
       });
 
       if (!res.ok) {
         const errorData = await res.json();
-        setErrors([errorData.error || 'Failed to create user']);
+        setErrors([errorData.error || "Failed to create user"]);
         return;
       }
 
@@ -78,16 +78,16 @@ export default function UsersPage() {
 
       setShowAddModal(false);
       setNewUser({
-        name: '',
-        surname: '',
-        email: '',
-        password: '',
-        role: 'USER',
+        name: "",
+        surname: "",
+        email: "",
+        password: "",
+        role: "USER",
         verified: false,
       });
     } catch (err) {
       console.error(err);
-      setErrors(['Unexpected error when creating user']);
+      setErrors(["Unexpected error when creating user"]);
     }
   };
 
@@ -95,16 +95,16 @@ export default function UsersPage() {
   const deleteUser = async (userId, userName) => {
     if (confirm(`Are you sure you want to delete "${userName}"?`)) {
       try {
-        const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+        const res = await fetch(`/api/users/${userId}`, { method: "DELETE" });
         if (res.ok) {
           setUsers(users.filter((u) => u.id !== userId));
           setMessage(`User "${userName}" deleted successfully.`);
         } else {
-          setErrors(['Failed to delete user.']);
+          setErrors(["Failed to delete user."]);
         }
       } catch (err) {
         console.error(err);
-        setErrors(['An unexpected error occurred.']);
+        setErrors(["An unexpected error occurred."]);
       }
     }
   };
@@ -113,7 +113,7 @@ export default function UsersPage() {
   useEffect(() => {
     if (message || errors.length) {
       const timer = setTimeout(() => {
-        setMessage('');
+        setMessage("");
         setErrors([]);
       }, 5000);
       return () => clearTimeout(timer);
@@ -121,19 +121,19 @@ export default function UsersPage() {
   }, [message, errors]);
 
   // Stats
-  const adminCount = users.filter((u) => u.role === 'ADMIN').length;
+  const adminCount = users.filter((u) => u.role === "ADMIN").length;
   const activeCount = users.filter((u) => u.verified).length;
 
   // Filtering
   const filteredUsers = users.filter((u) => {
     const matchesSearch =
-      (u.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (u.surname || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (u.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (u.surname || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesRole = !roleFilter || u.role.toLowerCase() === roleFilter;
     const matchesStatus =
-      !statusFilter || (u.verified ? 'active' : 'inactive') === statusFilter;
+      !statusFilter || (u.verified ? "active" : "inactive") === statusFilter;
 
     return matchesSearch && matchesRole && matchesStatus;
   });
@@ -145,7 +145,7 @@ export default function UsersPage() {
         <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-lg flex items-center justify-between">
           <p className="text-green-800 font-medium">{message}</p>
           <button
-            onClick={() => setMessage('')}
+            onClick={() => setMessage("")}
             className="text-green-500 hover:text-green-700"
           >
             ✕
@@ -276,14 +276,14 @@ export default function UsersPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-linear-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
-                          {user.name ? user.name[0].toUpperCase() : 'U'}
+                          {user.name ? user.name[0].toUpperCase() : "U"}
                         </div>
                         <div>
                           <p className="font-medium text-gray-900">
                             {user.name} {user.surname}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {user.profession || 'N/A'}
+                            {user.profession || "N/A"}
                           </p>
                         </div>
                       </div>
@@ -292,7 +292,7 @@ export default function UsersPage() {
                     <td className="px-6 py-4 text-gray-700">{user.email}</td>
 
                     <td className="px-6 py-4">
-                      {user.role === 'ADMIN' ? (
+                      {user.role === "ADMIN" ? (
                         <span className="px-3 py-1 rounded-full text-xs bg-purple-100 text-purple-800">
                           Admin
                         </span>
@@ -359,7 +359,9 @@ export default function UsersPage() {
         onClose={() => setIsModalOpen(false)}
         user={selectedUser}
         onUpdate={(updatedUser) => {
-          setUsers(users.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
+          setUsers(
+            users.map((u) => (u.id === updatedUser.id ? updatedUser : u))
+          );
         }}
       />
 

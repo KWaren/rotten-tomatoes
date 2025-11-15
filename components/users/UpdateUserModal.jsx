@@ -20,7 +20,7 @@ export default function UpdateUserModal({ isOpen, onClose, user, onUpdate }) {
         email: user.email || "",
         role: user.role || "USER",
         profession: user.profession || "",
-        birthday: user.birthday ? user.birthday.split('T')[0] : "",
+        birthday: user.birthday ? user.birthday.split("T")[0] : "",
       });
     }
   }, [user]);
@@ -47,11 +47,11 @@ export default function UpdateUserModal({ isOpen, onClose, user, onUpdate }) {
       if (!res.ok) throw new Error("Failed to update user");
 
       const updatedUser = await res.json();
-      
+
       alert("Utilisateur mis à jour avec succès !");
       if (onUpdate) onUpdate(updatedUser);
       onClose();
-      
+
       // Recharger la page pour afficher les modifications
       window.location.reload();
     } catch (error) {
