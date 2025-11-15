@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import logo from "../../public/Logo.png";
 
 export default function AdminMoviesListPage() {
   const [movies, setMovies] = useState([]);
@@ -44,26 +45,13 @@ export default function AdminMoviesListPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <span className="text-3xl leading-none">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  className="w-8 h-8 text-red-600"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 7.5h18M3 16.5h18M6 4.5v15M18 4.5v15"
-                  />
-                  <circle cx="7.5" cy="7.5" r="1.5" />
-                  <circle cx="7.5" cy="16.5" r="1.5" />
-                  <circle cx="16.5" cy="7.5" r="1.5" />
-                  <circle cx="16.5" cy="16.5" r="1.5" />
-                </svg>
-              </span>
+              <Image
+                src={logo}
+                alt="Logo"
+                width={50}
+                height={50}
+                className="px-0 py-0"
+              />
               <h1 className="text-2xl md:text-3xl font-bold text-red-600">
                 My Rotten Tomatoes - Admin
               </h1>
@@ -100,9 +88,7 @@ export default function AdminMoviesListPage() {
         {loading && (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">
-              loading...
-            </p>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">loading...</p>
           </div>
         )}
 
