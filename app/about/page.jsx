@@ -15,7 +15,27 @@ export default function AboutPage() {
   useEffect(() => {
     const loadMovies = async () => {
       const data = await get_popular_movies(1);
-      setMovies(data.results.slice(0, 12));
+      const tmdbMovies = data.results.slice(0, 12);
+
+      const dbResponse = await fetch("/api/movies", { cache: "no-store" });
+      const dbData = await dbResponse.json();
+      const dbMovies = dbData.movies || [];
+
+      const enrichedMovies = tmdbMovies.map((tmdbMovie) => {
+        const dbMovie = dbMovies.find((m) => m.tmdbId === tmdbMovie.id);
+        if (dbMovie) {
+          return {
+            ...tmdbMovie,
+            averageRating: dbMovie.averageRating,
+            _count: dbMovie._count,
+            ratings: dbMovie.ratings,
+            favorites: dbMovie.favorites,
+          };
+        }
+        return tmdbMovie;
+      });
+
+      setMovies(enrichedMovies);
     };
     loadMovies();
   }, []);
@@ -23,14 +43,12 @@ export default function AboutPage() {
   const handleProtectedNavigate = async (e, href) => {
     e.preventDefault();
     try {
-      // Use /api/me which checks our JWT cookie
       const res = await fetch("/api/me", { cache: "no-store" });
       if (!res.ok) {
         router.push("/login");
         return;
       }
       const json = await res.json();
-      // /api/me returns { user: {...} } or { user: null }
       if (!json || !json.user) {
         router.push("/login");
         return;
