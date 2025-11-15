@@ -1,146 +1,318 @@
-import { get_popular_movies, get_top_rated_movies } from "@/lib/tmdb";
-import MovieList from "@/components/movie/MovieList";
-import Link from "next/link";
-import logo from "../../public/Logo.png";
-import Image from "next/image";
+"use client";
 
-export default async function Home() {
-  const [popularMovies, topRatedMovies] = await Promise.all([
-    get_popular_movies(1),
-    get_top_rated_movies(1),
-  ]);
+import { useState, useEffect } from "react";
+import Link from "next/link";
+
+export default function AdminDashboard() {
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalMovies: 0,
+    activeUsers: 0,
+    totalComments: 0,
+  });
+  const [kpis, setKpis] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        // Récupérer les KPIs
+        const kpisRes = await fetch("/api/kpis");
+        const kpisData = await kpisRes.json();
+        setKpis(kpisData);
+
+        setStats({
+          totalUsers: kpisData.totalAccountsCount || 0,
+          totalMovies: kpisData.totalMoviesCount || 0,
+          activeUsers: kpisData.verifiedUsersCount || 0,
+          totalComments: 0,
+        });
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="text-gray-900 text-xl">Loading dashboard...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <Image
-                src={logo}
-                alt="Logo"
-                width={50}
-                height={50}
-                className="px-0 py-0"
-              />
-              <h1 className="text-2xl md:text-3xl font-bold text-yellow-400">
-                My Rotten Tomatoes
-              </h1>
-            </Link>
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h2>
+        <p className="text-gray-600">Overview of your application</p>
+      </div>
 
-            <nav className="flex gap-4 md:gap-6 text-sm md:text-base">
-              <Link
-                href="/"
-                className="text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500 font-medium transition-colors"
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center">
+              <svg
+                className="w-6 h-6 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                Home
-              </Link>
-              <Link
-                href="/movies"
-                className="text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500 font-medium transition-colors"
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mb-1">Total Users</p>
+          <h3 className="text-2xl font-bold text-gray-900">
+            {stats.totalUsers}
+          </h3>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center">
+              <svg
+                className="w-6 h-6 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                Movies
-              </Link>
-            </nav>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mb-1">Active Users</p>
+          <h3 className="text-2xl font-bold text-gray-900">
+            {stats.activeUsers}
+          </h3>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center">
+              <svg
+                className="w-6 h-6 text-purple-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"
+                />
+              </svg>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mb-1">Total Movies</p>
+          <h3 className="text-2xl font-bold text-gray-900">
+            {stats.totalMovies}
+          </h3>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center">
+              <svg
+                className="w-6 h-6 text-yellow-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                />
+              </svg>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mb-1">Comments</p>
+          <h3 className="text-2xl font-bold text-gray-900">
+            {stats.totalComments}
+          </h3>
+        </div>
+      </div>
+
+      {/* Popular Genres */}
+      {kpis?.genresPopular && kpis.genresPopular.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Most Popular Genres (by average rating)
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {kpis.genresPopular.slice(0, 6).map((genre, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+              >
+                <div>
+                  <p className="font-medium text-gray-900">{genre.genre}</p>
+                  <p className="text-sm text-gray-600">
+                    {genre.movieCount} movies
+                  </p>
+                </div>
+                <div className="flex items-center gap-1">
+                  <svg
+                    className="w-5 h-5 text-yellow-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span className="font-bold text-gray-900">
+                    {genre.avgRating}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </header>
+      )}
 
-      <main className="container mx-auto px-4 py-12 space-y-16 min-h-screen">
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="size-6 text-yellow-300"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z"
-                />
-              </svg>
-              Popular Movies
-            </h2>
-            <Link
-              href="/movies"
-              className="text-red-600 hover:text-red-700 font-medium text-sm md:text-base"
-            >
-              See more
-            </Link>
+      {/* Popular Movies by Age Group */}
+      {kpis?.moviesByAgeGroup &&
+        Object.keys(kpis.moviesByAgeGroup).length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Popular Movies by Age Group
+            </h3>
+            <div className="space-y-6">
+              {Object.entries(kpis.moviesByAgeGroup).map(
+                ([ageGroup, movies]) => (
+                  <div key={ageGroup}>
+                    <h4 className="font-semibold text-gray-800 mb-3">
+                      {ageGroup} years old
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                      {movies.map((movie) => (
+                        <div
+                          key={movie.id}
+                          className="bg-gray-50 rounded-lg p-3 flex flex-col"
+                        >
+                          <p className="font-medium text-sm text-gray-900 line-clamp-1">
+                            {movie.title}
+                          </p>
+                          <div className="flex items-center gap-1 mt-2">
+                            <svg
+                              className="w-4 h-4 text-yellow-400"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <span className="text-sm font-medium text-gray-900">
+                              {movie.avgRating}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              ({movie.ratingCount})
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
           </div>
-          <MovieList
-            movies={popularMovies.results.slice(0, 12)}
-            variant="admin"
-            basePath="/admin/movies-tmdb"
-          />
-        </section>
+        )}
 
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="size-6 text-yellow-400"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"
-                />
-              </svg>
-              Top Rated
-            </h2>
-            <Link
-              href="/movies?sort=top_rated"
-              className="text-red-600 hover:text-red-700 font-medium text-sm md:text-base"
-            >
-              See more
-            </Link>
-          </div>
-          <MovieList
-            movies={topRatedMovies.results.slice(0, 12)}
-            variant="admin"
-            basePath="/admin/movies-tmdb"
-          />
-        </section>
-      </main>
-
-      <footer className="bg-gray-900 text-white py-8 mt-16">
-        <div className="container mx-auto px-4 text-center">
-          <p className="flex justify-center items-center gap-2 text-gray-400">
-            © 2025 My Rotten Tomatoes - Made with
+      {/* Quick Actions */}
+      <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Quick Actions
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Link
+            href="/admin/users"
+            className="flex items-center space-x-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
+          >
             <svg
-              xmlns="http://www.w3.org/2000/svg"
+              className="w-6 h-6 text-blue-600"
               fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
               stroke="currentColor"
-              className="size-6 text-red-600"
+              viewBox="0 0 24 24"
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                strokeWidth={2}
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
               />
             </svg>
-            by 2WLG Team
-          </p>
+            <div>
+              <p className="font-medium text-gray-900">Manage Users</p>
+              <p className="text-sm text-gray-600">View and edit users</p>
+            </div>
+          </Link>
+
+          <Link
+            href="/admin/movies"
+            className="flex items-center space-x-3 p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition"
+          >
+            <svg
+              className="w-6 h-6 text-purple-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"
+              />
+            </svg>
+            <div>
+              <p className="font-medium text-gray-900">Manage Movies</p>
+              <p className="text-sm text-gray-600">View and edit movies</p>
+            </div>
+          </Link>
+
+          <Link
+            href="/admin/movies-tmdb"
+            className="flex items-center space-x-3 p-4 bg-green-50 hover:bg-green-100 rounded-lg transition"
+          >
+            <svg
+              className="w-6 h-6 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            <div>
+              <p className="font-medium text-gray-900">Add from TMDB</p>
+              <p className="text-sm text-gray-600">Import movies from TMDB</p>
+            </div>
+          </Link>
         </div>
-      </footer>
+      </div>
     </div>
   );
 }

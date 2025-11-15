@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import MovieList from "@/components/movie/MovieList";
 import FilterBar from "@/components/movie/filterBar";
 import AuthenticatedHeader from "@/components/layout/AuthenticatedHeader";
+import Footer from "@/components/layout/Footer";
 
 export default function MoviesPage() {
   const [movies, setMovies] = useState([]);
@@ -14,6 +15,7 @@ export default function MoviesPage() {
   const [selectedGenre, setSelectedGenre] = useState(null);
   const [selectedYear, setSelectedYear] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDirector, setSelectedDirector] = useState(null);
   const [sortBy, setSortBy] = useState("popularity.desc");
 
   useEffect(() => {
@@ -23,9 +25,9 @@ export default function MoviesPage() {
         const data = await res.json();
         setAllMovies(data.movies || []);
 
-        const uniqueGenres = [
-          ...new Set(data.movies.map((m) => m.genre).filter(Boolean)),
-        ];
+        // Extraire tous les genres uniques depuis le tableau genres de chaque film
+        const allGenres = data.movies.flatMap((m) => m.genres || []);
+        const uniqueGenres = [...new Set(allGenres)].filter(Boolean).sort();
         setGenres(uniqueGenres.map((name, index) => ({ id: index + 1, name })));
       } catch (error) {
         console.error("Error while loading movies:", error);
@@ -55,7 +57,7 @@ export default function MoviesPage() {
       if (selectedGenre) {
         const genreName = genres.find((g) => g.id === selectedGenre)?.name;
         filteredMovies = filteredMovies.filter(
-          (movie) => movie.genre === genreName
+          (movie) => movie.genres && movie.genres.includes(genreName)
         );
       }
 
@@ -68,15 +70,29 @@ export default function MoviesPage() {
         });
       }
 
+      if (selectedDirector) {
+        filteredMovies = filteredMovies.filter(
+          (movie) => movie.director === selectedDirector
+        );
+      }
+
       filteredMovies = sortMovies(filteredMovies, sortBy);
 
       setMovies(filteredMovies);
       setLoading(false);
     };
 
-    const timer = setTimeout(filterMovies, 10000);
-    return () => clearTimeout(timer);
-  }, [allMovies, selectedGenre, selectedYear, searchQuery, sortBy, genres]);
+    // Appliquer les filtres immédiatement sans délai
+    filterMovies();
+  }, [
+    allMovies,
+    selectedGenre,
+    selectedYear,
+    searchQuery,
+    selectedDirector,
+    sortBy,
+    genres,
+  ]);
 
   const sortMovies = (moviesList, sortOption) => {
     const sorted = [...moviesList];
@@ -133,6 +149,8 @@ export default function MoviesPage() {
                 onYearChange={setSelectedYear}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
+                selectedDirector={selectedDirector}
+                onDirectorChange={setSelectedDirector}
                 sortBy={sortBy}
                 onSortChange={setSortBy}
               />
@@ -161,28 +179,7 @@ export default function MoviesPage() {
         </div>
       </main>
 
-      <footer className="bg-gray-900 text-white py-8 mt-16">
-        <div className="container mx-auto px-4 text-center">
-          <p className="flex justify-center items-center gap-2 text-gray-400">
-            © 2025 My Rotten Tomatoes - Made with
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="size-6 text-red-600"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-              />
-            </svg>
-            by 2WLG Team
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

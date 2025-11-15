@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AuthenticatedHeader from "@/components/layout/AuthenticatedHeader";
+import Footer from "@/components/layout/Footer";
 
 export default function ProfilePage() {
   const { user, loading } = useAuth();
@@ -248,6 +249,7 @@ export default function ProfilePage() {
           </Link>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

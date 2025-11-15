@@ -7,6 +7,7 @@ import FavoriteButton from "@/components/movie/FavoriteButton";
 import CommentSection from "@/components/comments/CommentSection";
 import CastSlider from "@/components/movie/CastSlider";
 import AuthenticatedHeader from "@/components/layout/AuthenticatedHeader";
+import Footer from "@/components/layout/Footer";
 
 const getImageUrl = (path, size = "w500") => {
   if (!path) return "/default-Movie-image.jpg";
@@ -252,6 +253,7 @@ export default function MovieClientPage({ movie }) {
         {/* Gil */}
         <CommentSection movieId={movie.id} />
       </main>
+      <Footer />
     </div>
   );
 }

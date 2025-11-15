@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import AuthenticatedHeader from "@/components/layout/AuthenticatedHeader";
 import MovieList from "@/components/movie/MovieList";
+import Footer from "@/components/layout/Footer";
 
 export default function FavoritesPage() {
   const { user, loading: authLoading } = useAuth();
@@ -139,6 +140,7 @@ export default function FavoritesPage() {
           <MovieList movies={favorites} variant="user" basePath="/movies" />
         )}
       </main>
+      <Footer />
     </div>
   );
 }

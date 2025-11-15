@@ -11,7 +11,10 @@ function calculateAge(birthdayString) {
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
     return age;
@@ -57,22 +60,28 @@ export async function GET(request) {
 
     const genreStats = {};
     moviesWithRatings.forEach((movie) => {
-      if (!genreStats[movie.genre]) {
-        genreStats[movie.genre] = { totalScore: 0, count: 0, movies: 0 };
-      }
-      genreStats[movie.genre].movies += 1;
-      if (movie.ratings.length > 0) {
-        const avgScore =
-          movie.ratings.reduce((sum, r) => sum + r.score, 0) / movie.ratings.length;
-        genreStats[movie.genre].totalScore += avgScore;
-        genreStats[movie.genre].count += 1;
-      }
+      // Gérer le champ genres qui est un tableau
+      const movieGenres = movie.genres || [];
+      movieGenres.forEach((genre) => {
+        if (!genreStats[genre]) {
+          genreStats[genre] = { totalScore: 0, count: 0, movies: 0 };
+        }
+        genreStats[genre].movies += 1;
+        if (movie.ratings.length > 0) {
+          const avgScore =
+            movie.ratings.reduce((sum, r) => sum + r.score, 0) /
+            movie.ratings.length;
+          genreStats[genre].totalScore += avgScore;
+          genreStats[genre].count += 1;
+        }
+      });
     });
 
     const genresPopular = Object.entries(genreStats)
       .map(([genre, stats]) => ({
         genre,
-        avgRating: stats.count > 0 ? (stats.totalScore / stats.count).toFixed(2) : 0,
+        avgRating:
+          stats.count > 0 ? (stats.totalScore / stats.count).toFixed(2) : 0,
         movieCount: stats.movies,
       }))
       .sort((a, b) => parseFloat(b.avgRating) - parseFloat(a.avgRating));
