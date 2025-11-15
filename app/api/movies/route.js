@@ -24,6 +24,16 @@ export async function GET(request) {
         take: limit,
         orderBy: { createdAt: "desc" },
         include: {
+          ratings: {
+            select: {
+              score: true,
+            },
+          },
+          favorites: {
+            select: {
+              userId: true,
+            },
+          },
           _count: {
             select: {
               ratings: true,
@@ -36,11 +46,20 @@ export async function GET(request) {
       prisma.movie.count({ where }),
     ]);
 
-    const serializedMovies = movies.map((movie) => ({
-      ...movie,
-      budget: movie.budget ? movie.budget.toString() : null,
-      revenue: movie.revenue ? movie.revenue.toString() : null,
-    }));
+    const serializedMovies = movies.map((movie) => {
+      const averageRating =
+        movie.ratings.length > 0
+          ? movie.ratings.reduce((sum, r) => sum + r.score, 0) /
+            movie.ratings.length
+          : 0;
+
+      return {
+        ...movie,
+        budget: movie.budget ? movie.budget.toString() : null,
+        revenue: movie.revenue ? movie.revenue.toString() : null,
+        averageRating: parseFloat(averageRating.toFixed(1)),
+      };
+    });
 
     return NextResponse.json({
       movies: serializedMovies,

@@ -12,14 +12,23 @@ export async function POST(req) {
     //  Vérifie si l'utilisateur existe
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user)
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 401 }
+      );
 
     if (!user.verified)
-      return NextResponse.json({ error: "Email not verified" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Email not verified" },
+        { status: 403 }
+      );
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 401 }
+      );
 
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
@@ -31,8 +40,12 @@ export async function POST(req) {
     const { password: _, ...safeUser } = user;
 
     // 6️⃣ Crée une réponse avec cookie
-    const response = NextResponse.json({ message: "Login successful", user: safeUser });
-    response.cookies.set("token", token, {
+    const cookieName = process.env.COOKIE_NAME || "sid";
+    const response = NextResponse.json({
+      message: "Login successful",
+      user: safeUser,
+    });
+    response.cookies.set(cookieName, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -41,7 +54,6 @@ export async function POST(req) {
     });
 
     return response;
-
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json({ error: "Login failed" }, { status: 500 });

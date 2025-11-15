@@ -16,9 +16,10 @@ const publicRoutes = [
   "/api/auth/verify",
   "/api/auth/logout",
   "/api/auth/resend",
+  "/api/me",
 ];
 
-export function proxy(req) {
+export async function proxy(req) {
   const { pathname } = req.nextUrl;
 
   // 🔹 Exclure les fichiers statiques (Tailwind, images, JS, etc.)
