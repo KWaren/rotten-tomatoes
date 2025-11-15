@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function FilterBar({
   genres,
@@ -16,6 +16,19 @@ export default function FilterBar({
   onDirectorChange,
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [directors, setDirectors] = useState([]);
+
+  useEffect(() => {
+    // Récupérer la liste des directors depuis la base de données
+    fetch("/api/directors")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.directors) {
+          setDirectors(data.directors);
+        }
+      })
+      .catch((err) => console.error("Error fetching directors:", err));
+  }, []);
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 50 }, (_, i) => currentYear - i);
@@ -35,7 +48,7 @@ export default function FilterBar({
     onGenreChange(null);
     onYearChange(null);
     onSearchChange("");
-    if (onDirectorChange) onDirectorChange("");
+    if (onDirectorChange) onDirectorChange(null);
     if (onSortChange) onSortChange("popularity.desc");
   };
 
@@ -153,20 +166,20 @@ export default function FilterBar({
           <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
             Director
           </label>
-          <input
-            type="text"
-            placeholder="Director name..."
+          <select
             value={selectedDirector || ""}
             onChange={(e) =>
-              onDirectorChange && onDirectorChange(e.target.value)
+              onDirectorChange && onDirectorChange(e.target.value || null)
             }
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-          />
-          {selectedDirector && (
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Director filter : "{selectedDirector}"
-            </p>
-          )}
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          >
+            <option value="">All directors</option>
+            {directors.map((director) => (
+              <option key={director} value={director}>
+                {director}
+              </option>
+            ))}
+          </select>
         </div>
 
         {onSortChange && (
