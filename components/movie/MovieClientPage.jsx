@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import FavoriteButton from "@/components/movie/FavoriteButton";
 import CommentSection from "@/components/comments/CommentSection";
 import CastSlider from "@/components/movie/CastSlider";
+import AuthenticatedHeader from "@/components/layout/AuthenticatedHeader";
 
 const getImageUrl = (path, size = "w500") => {
   if (!path) return "/default-Movie-image.jpg";
@@ -18,43 +19,42 @@ const getImageUrl = (path, size = "w500") => {
 };
 
 export default function MovieClientPage({ movie }) {
-  const releaseYear = movie.releaseDate
-    ? new Date(movie.releaseDate).getFullYear()
+  const [movieData, setMovieData] = useState(movie);
+
+  useEffect(() => {
+    // Refresh movie data when ratings change
+    const handleRatingUpdate = async () => {
+      try {
+        const response = await fetch(`/api/movies/${movie.id}`, {
+          cache: "no-store",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setMovieData(data);
+        }
+      } catch (error) {
+        console.error("Error refreshing movie data:", error);
+      }
+    };
+
+    // Listen for custom event from StarRating component
+    window.addEventListener("ratingUpdated", handleRatingUpdate);
+    return () =>
+      window.removeEventListener("ratingUpdated", handleRatingUpdate);
+  }, [movie.id]);
+
+  const releaseYear = movieData.releaseDate
+    ? new Date(movieData.releaseDate).getFullYear()
     : "N/A";
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <h1 className="text-2xl md:text-3xl font-bold text-red-600">
-                My Rotten Tomatoes
-              </h1>
-            </Link>
-
-            <nav className="flex gap-4 md:gap-6 text-sm md:text-base">
-              <Link
-                href="/"
-                className="text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500 font-medium transition-colors"
-              >
-                Home
-              </Link>
-              <Link
-                href="/movies"
-                className="text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500 font-medium transition-colors"
-              >
-                Movies
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <AuthenticatedHeader />
 
       <div className="relative h-[300px] md:h-[500px] w-full">
         <Image
-          src={getImageUrl(movie.backdropUrl, "original")}
-          alt={movie.title}
+          src={getImageUrl(movieData.backdropUrl, "original")}
+          alt={movieData.title}
           fill
           className="object-cover"
           priority
@@ -68,14 +68,16 @@ export default function MovieClientPage({ movie }) {
           >
             Back
           </Link>
-          {movie.voteAverage && (
-            <span className="ml-4 inline-flex items-center gap-1 bg-black/50 text-white px-3 py-2 rounded-lg text-sm">
-              ⭐ {movie.voteAverage.toFixed(1)}
-            </span>
-          )}
-          {movie.voteCount && (
+          {movieData.averageRating !== undefined &&
+            movieData.averageRating > 0 && (
+              <span className="ml-4 inline-flex items-center gap-1 bg-black/50 text-white px-3 py-2 rounded-lg text-sm">
+                ⭐ {movieData.averageRating.toFixed(1)}/10
+              </span>
+            )}
+          {movieData._count?.ratings && (
             <span className="ml-2 inline-flex items-center gap-1 bg-black/50 text-white px-3 py-2 rounded-lg text-sm">
-              {movie.voteCount.toLocaleString()} votes
+              {movieData._count.ratings}{" "}
+              {movieData._count.ratings > 1 ? "notes" : "note"}
             </span>
           )}
         </div>
@@ -88,8 +90,8 @@ export default function MovieClientPage({ movie }) {
           <div className="md:col-span-1">
             <div className="relative aspect-2/3 rounded-lg overflow-hidden shadow-2xl">
               <Image
-                src={getImageUrl(movie.posterUrl, "w500")}
-                alt={movie.title}
+                src={getImageUrl(movieData.posterUrl, "w500")}
+                alt={movieData.title}
                 fill
                 className="object-cover"
               />
@@ -100,16 +102,17 @@ export default function MovieClientPage({ movie }) {
             <div className="space-y-6">
               <div>
                 <h1 className="text-4xl md:text-5xl font-bold mb-2 text-gray-900 dark:text-white">
-                  {movie.title}
+                  {movieData.title}
                 </h1>
-                {movie.originalTitle && movie.originalTitle !== movie.title && (
-                  <p className="text-lg text-gray-600 dark:text-gray-400 italic mb-2">
-                    ({movie.originalTitle})
-                  </p>
-                )}
-                {movie.tagline && (
+                {movieData.originalTitle &&
+                  movieData.originalTitle !== movieData.title && (
+                    <p className="text-lg text-gray-600 dark:text-gray-400 italic mb-2">
+                      ({movieData.originalTitle})
+                    </p>
+                  )}
+                {movieData.tagline && (
                   <p className="text-xl text-gray-700 dark:text-gray-300 italic">
-                    "{movie.tagline}"
+                    "{movieData.tagline}"
                   </p>
                 )}
               </div>
@@ -119,28 +122,28 @@ export default function MovieClientPage({ movie }) {
                   {releaseYear}
                 </span>
                 <span className="text-gray-700 dark:text-gray-300">
-                  {movie.runtime
-                    ? `${Math.floor(movie.runtime / 60)}h ${
-                        movie.runtime % 60
+                  {movieData.runtime
+                    ? `${Math.floor(movieData.runtime / 60)}h ${
+                        movieData.runtime % 60
                       }min`
                     : "N/A"}
                 </span>
                 <span className="text-gray-700 dark:text-gray-300 capitalize">
-                  {movie.status}
+                  {movieData.status}
                 </span>
 
                 <div className="ml-auto">
                   <FavoriteButton
                     movieId={movie.id}
-                    initialFavorites={movie.favorites || []}
+                    initialFavorites={movieData.favorites || []}
                   />
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-2">
-                {Array.isArray(movie.genres) &&
-                  movie.genres.length > 0 &&
-                  movie.genres.map((g, idx) => (
+                {Array.isArray(movieData.genres) &&
+                  movieData.genres.length > 0 &&
+                  movieData.genres.map((g, idx) => (
                     <span
                       key={idx}
                       className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full text-sm font-medium transition-colors"
@@ -150,10 +153,10 @@ export default function MovieClientPage({ movie }) {
                   ))}
               </div>
 
-              {movie.director && (
+              {movieData.director && (
                 <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <span className="font-semibold">Director:</span>
-                  <span>{movie.director}</span>
+                  <span>{movieData.director}</span>
                 </div>
               )}
 
@@ -162,12 +165,12 @@ export default function MovieClientPage({ movie }) {
                   Synopsis
                 </h2>
                 <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
-                  {movie.description || "Aucun synopsis disponible."}
+                  {movieData.description || "No synopsis available."}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                {movie.budget && Number(movie.budget) > 0 && (
+                {movieData.budget && Number(movieData.budget) > 0 && (
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       Budget
@@ -177,11 +180,11 @@ export default function MovieClientPage({ movie }) {
                         style: "currency",
                         currency: "USD",
                         maximumFractionDigits: 0,
-                      }).format(Number(movie.budget))}
+                      }).format(Number(movieData.budget))}
                     </p>
                   </div>
                 )}
-                {movie.revenue && Number(movie.revenue) > 0 && (
+                {movieData.revenue && Number(movieData.revenue) > 0 && (
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       Revenue
@@ -191,14 +194,14 @@ export default function MovieClientPage({ movie }) {
                         style: "currency",
                         currency: "USD",
                         maximumFractionDigits: 0,
-                      }).format(Number(movie.revenue))}
+                      }).format(Number(movieData.revenue))}
                     </p>
                   </div>
                 )}
-                {movie.homepage && (
+                {movieData.homepage && (
                   <div className="col-span-2">
                     <a
-                      href={movie.homepage}
+                      href={movieData.homepage}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-red-600 hover:text-red-700 font-medium"
@@ -213,18 +216,18 @@ export default function MovieClientPage({ movie }) {
         </div>
 
         {/* Casting */}
-        {Array.isArray(movie.cast) && movie.cast.length > 0 && (
-          <CastSlider cast={movie.cast} />
+        {Array.isArray(movieData.cast) && movieData.cast.length > 0 && (
+          <CastSlider cast={movieData.cast} />
         )}
 
-        {Array.isArray(movie.productionCompanies) &&
-          movie.productionCompanies.length > 0 && (
+        {Array.isArray(movieData.productionCompanies) &&
+          movieData.productionCompanies.length > 0 && (
             <div className="mt-12">
               <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
                 Production
               </h2>
               <div className="flex flex-wrap gap-6">
-                {movie.productionCompanies.map((company, idx) => (
+                {movieData.productionCompanies.map((company, idx) => (
                   <div
                     key={company.id || idx}
                     className="flex items-center gap-2 text-gray-700 dark:text-gray-300"

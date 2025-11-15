@@ -41,7 +41,7 @@ export default function CastSlider({ cast = [] }) {
         {cast.slice(0, 12).map((actor, i) => (
           <div
             key={actor.id || i}
-            className="text-center bg-white dark:bg-gray-800 rounded-lg p-4 shadow flex-shrink-0 w-40 scroll-snap-align-start"
+            className="text-center bg-white dark:bg-gray-800 rounded-lg p-4 shadow shrink-0 w-40 scroll-snap-align-start"
           >
             <div className="relative aspect-square rounded-lg overflow-hidden mb-3">
               <Image

@@ -1,17 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { useSession, signIn } from "next-auth/react";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 export default function CommentForm({ movieId, onPosted }) {
-  const { data: session } = useSession();
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!session) {
-      signIn();
+    if (!user) {
+      router.push("/login");
       return;
     }
     if (!newComment.trim()) return;
@@ -20,7 +22,11 @@ export default function CommentForm({ movieId, onPosted }) {
       const res = await fetch(`/api/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: session.user.id, movieId, content: newComment.trim() }),
+        body: JSON.stringify({
+          userId: user.id,
+          movieId,
+          content: newComment.trim(),
+        }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Failed to post comment");
@@ -36,10 +42,17 @@ export default function CommentForm({ movieId, onPosted }) {
   return (
     <div className="mb-6">
       <div>
-        {!session ? (
+        {loading ? (
           <div className="text-sm text-gray-600 dark:text-gray-300">
-            You must be signed in to post comments.{' '}
-            <button className="text-red-600 underline cursor-pointer" onClick={() => signIn()}>
+            Loading...
+          </div>
+        ) : !user ? (
+          <div className="text-sm text-gray-600 dark:text-gray-300">
+            You must be signed in to post comments.{" "}
+            <button
+              className="text-red-600 underline cursor-pointer"
+              onClick={() => router.push("/login")}
+            >
               Sign in
             </button>
           </div>

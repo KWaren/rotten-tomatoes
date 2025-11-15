@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSession, signIn } from "next-auth/react";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 import Stars from "./Stars";
 import Star from "./Star";
 
@@ -11,7 +12,8 @@ export default function RatingModal({
   onClose,
   onRatingSubmitted,
 }) {
-  const { data: session } = useSession();
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [selectedScore, setSelectedScore] = useState(
     userRating ? userRating.score : 0
@@ -22,8 +24,8 @@ export default function RatingModal({
   };
 
   const handleSubmit = async () => {
-    if (!session) {
-      signIn();
+    if (!user) {
+      router.push("/login");
       return;
     }
     if (!movieId || !selectedScore) return;
@@ -43,7 +45,7 @@ export default function RatingModal({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            userId: session.user.id,
+            userId: user.id,
             movieId,
             score: selectedScore,
           }),

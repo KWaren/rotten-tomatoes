@@ -1,12 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/hooks/useAuth";
 import StarRating from "@/components/ratings/StarRating";
 import CommentForm from "./CommentForm";
 import CommentList from "./CommentList";
 
 export default function CommentSection({ movieId }) {
-  const { data: session } = useSession();
+  const { user, loading: authLoading } = useAuth();
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -78,14 +78,14 @@ export default function CommentSection({ movieId }) {
     <section id="comments-section" className="mt-12">
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center">
-          𓂃˖˳·˖ ִֶָ ⋆ ִֶָ Comments  ִֶָ⋆ ִֶָ˖·˳˖𓂃 
+          𓂃˖˳·˖ ִֶָ ⋆ ִֶָ Comments ִֶָ⋆ ִֶָ˖·˳˖𓂃
         </h2>
 
         <div className="flex items-center mb-4 gap-2">
           <div className="bg-red-600 text-red-600 rounded w-2 h-10">.</div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          Your current Rate
-        </h2>
+            Your current Rate
+          </h2>
         </div>
         <div className="mb-6">
           <StarRating movieId={movieId} />
@@ -97,7 +97,7 @@ export default function CommentSection({ movieId }) {
             comments={comments}
             loading={loading}
             error={error}
-            currentUserId={session?.user?.id}
+            currentUserId={user?.id}
             onDelete={handleDelete}
             onEdit={handleEdit}
           />

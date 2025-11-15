@@ -72,8 +72,11 @@ export default function MovieCard({
   const handleNavigate = async (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Check if user is authenticated by calling our /api/me endpoint.
+    // If not authenticated, redirect to login. Otherwise navigate to movie page.
     try {
-      const res = await fetch("/api/auth/session", { cache: "no-store" });
+      const res = await fetch("/api/me", { cache: "no-store" });
       if (!res.ok) {
         router.push("/login");
         return;
@@ -135,13 +138,15 @@ export default function MovieCard({
                   </svg>
                 </span>
                 <span className="font-medium text-gray-900 dark:text-white">
-                  {movie.vote_average?.toFixed(1) || "N/A"}
+                  {movie.averageRating && movie.averageRating > 0
+                    ? movie.averageRating.toFixed(1)
+                    : "N/A"}
                 </span>
               </div>
             </div>
 
             <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              {movie.vote_count || 0} votes
+              {movie._count?.ratings || 0} votes
             </div>
           </div>
         </Link>

@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { useSession, signIn } from "next-auth/react";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 import Stars from "./Stars";
 import RatingModal from "./RatingModal";
 
 export default function StarRating({ movieId }) {
-  const { data: session } = useSession();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const [ratings, setRatings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userRating, setUserRating] = useState(null);
@@ -17,14 +19,19 @@ export default function StarRating({ movieId }) {
     if (!movieId) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/ratings?movieId=${encodeURIComponent(movieId)}`, { cache: 'no-store' });
+      const res = await fetch(
+        `/api/ratings?movieId=${encodeURIComponent(movieId)}`,
+        { cache: "no-store" }
+      );
       const json = await res.json();
       const list = json.data || [];
       setRatings(list);
-      const avg = list.length ? list.reduce((s, it) => s + Number(it.score), 0) / list.length : 0;
+      const avg = list.length
+        ? list.reduce((s, it) => s + Number(it.score), 0) / list.length
+        : 0;
       setAverage(avg);
-      if (session && session.user) {
-        const ur = list.find((it) => String(it.userId) === String(session.user.id));
+      if (user) {
+        const ur = list.find((it) => String(it.userId) === String(user.id));
         if (ur) setUserRating({ id: ur.id, score: Number(ur.score) });
         else setUserRating(null);
       }
@@ -33,7 +40,7 @@ export default function StarRating({ movieId }) {
     } finally {
       setLoading(false);
     }
-  }, [movieId, session]);
+  }, [movieId, user]);
 
   useEffect(() => {
     fetchRatings();
@@ -41,11 +48,13 @@ export default function StarRating({ movieId }) {
 
   const handleRatingSubmitted = () => {
     fetchRatings();
+    // Emit custom event to notify MovieClientPage
+    window.dispatchEvent(new Event("ratingUpdated"));
   };
 
   const openModal = () => {
-    if (!session) {
-      signIn();
+    if (!user) {
+      router.push("/login");
       return;
     }
     setIsModalOpen(true);
@@ -55,11 +64,7 @@ export default function StarRating({ movieId }) {
     <div className="mb-4">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1">
-          <Stars
-            count={1}
-            value={average > 0 ? 1 : 0}
-            disabled={true}
-          />
+          <Stars count={1} value={average > 0 ? 1 : 0} disabled={true} />
         </div>
         <div className="text-lg">
           <span className="font-bold">{average}</span>

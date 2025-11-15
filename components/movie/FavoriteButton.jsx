@@ -21,8 +21,7 @@ export default function FavoriteButton({
           ? initialFavorites.some((f) => f.userId === user.id)
           : false;
         setIsFavorite(found);
-      } catch (e) {
-      }
+      } catch (e) {}
     };
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -55,6 +54,8 @@ export default function FavoriteButton({
         } else if (json.isFavorite === undefined) {
           setIsFavorite((s) => !s);
         }
+        // Emit custom event to notify favorites page
+        window.dispatchEvent(new Event("favoriteUpdated"));
       }
     } catch (err) {
       console.error("Favorite toggle error", err);
