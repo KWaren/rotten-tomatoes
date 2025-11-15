@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import AuthenticatedHeader from "@/components/layout/AuthenticatedHeader";
 
 export default function ProfilePage() {
