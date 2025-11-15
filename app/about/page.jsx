@@ -128,8 +128,8 @@ export default function AboutPage() {
             <Image
               src="/woman-enjoys-movie-alone-dark-cinema_932138-44337.jpg"
               alt="Hero background"
-              layout="fill"
-              objectFit="cover"
+              fill
+              style={{ objectFit: "cover" }}
               loading="eager"
               className="opacity-30"
             />
@@ -138,7 +138,7 @@ export default function AboutPage() {
           <div className="relative container mx-auto px-4 z-10">
             <div className="max-w-2xl mx-auto text-center">
               {/* <p className="text-red-500 font-bold text-lg">MOVIE DISCOVERY PLATFORM</p> */}
-              <h2 className="text-6xl font-extrabold my-4">
+              <h2 className="text-4xl md:text-6xl font-extrabold my-4">
                 DISCOVER OR BE DISCOVERED
               </h2>
               <p className="text-lg">
