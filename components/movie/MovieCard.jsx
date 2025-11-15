@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const getImageUrl = (path, size = "w500") => {
   if (!path) return "/default-Movie-image.jpg";
@@ -26,15 +27,16 @@ export default function MovieCard({
   variant = "user",
   basePath = "/movies",
 }) {
+  const router = useRouter();
   const [importing, setImporting] = useState(false);
   const [imported, setImported] = useState(false);
 
   let imageUrl = "/default-Movie-image.jpg";
 
   if (movie.posterUrl && isValidUrl(movie.posterUrl)) {
-    imageUrl = movie.posterUrl; 
+    imageUrl = movie.posterUrl;
   } else if (movie.poster_path) {
-    imageUrl = getImageUrl(movie.poster_path); 
+    imageUrl = getImageUrl(movie.poster_path);
   }
 
   const releaseDate = movie.releaseDate || movie.release_date;
@@ -67,10 +69,31 @@ export default function MovieCard({
     }
   };
 
+  const handleNavigate = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const res = await fetch("/api/auth/session", { cache: "no-store" });
+      if (!res.ok) {
+        router.push("/login");
+        return;
+      }
+      const json = await res.json();
+      if (!json || !json.user) {
+        router.push("/login");
+        return;
+      }
+
+      router.push(`${basePath}/${movie.id}`);
+    } catch (err) {
+      router.push("/login");
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <div className="group cursor-pointer overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 bg-white dark:bg-gray-800">
-        <Link href={`${basePath}/${movie.id}`}>
+        <Link href={`${basePath}/${movie.id}`} onClick={handleNavigate}>
           <div className="relative aspect-2/3 w-full bg-gray-200 dark:bg-gray-700">
             <Image
               src={imageUrl}

@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { get_popular_movies, IMAGE_BASE_URL } from "@/lib/tmdb";
 import Link from "next/link";
 import Image from "next/image";
 import MovieCard from "@/components/movie/MovieCard";
+import { useRouter } from "next/navigation";
 
 export default function AboutPage() {
   const [movies, setMovies] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     const loadMovies = async () => {
@@ -16,6 +18,26 @@ export default function AboutPage() {
     };
     loadMovies();
   }, []);
+
+  const handleProtectedNavigate = async (e, href) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/auth/session", { cache: "no-store" });
+      if (!res.ok) {
+        router.push("/login");
+        return;
+      }
+      const json = await res.json();
+      if (!json) {
+        router.push("/login");
+        return;
+      }
+
+      router.push(href);
+    } catch (err) {
+      router.push("/login");
+    }
+  };
 
   return (
     <div className="bg-black text-white min-h-screen font-sans">
@@ -42,24 +64,46 @@ export default function AboutPage() {
             My Rotten Tomatoes
           </h1>
         </Link>
-        {/* <nav className="hidden md:flex gap-8 items-center">
-          <Link href="/about" className="hover:text-red-500 transition-colors">
-            About
-          </Link>
-          <Link href="/movies" className="hover:text-red-500 transition-colors">
-            Movies
+        <div className="flex gap-3">
+          <Link
+            href="/login"
+            className="bg-gray-700 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition-colors flex gap-2"
+          >
+            Login
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="size-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
+              />
+            </svg>
           </Link>
           <Link
-            href="/#gallery"
-            className="hover:text-red-500 transition-colors"
+            href="/register"
+            className="bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition-colors flex gap-2"
           >
-            Gallery
-          </Link>
-          <Link
-            href="/#gameplay"
-            className="hover:text-red-500 transition-colors"
-          >
-            Gameplay
+            Sign Up
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="size-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"
+              />
+            </svg>
           </Link>
         </nav> */}
         <Link
@@ -82,6 +126,7 @@ export default function AboutPage() {
             />
           </svg>
         </Link>
+        </div>
       </header>
 
       <main>
@@ -96,7 +141,7 @@ export default function AboutPage() {
               loading="eager"
               className="opacity-30"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black" />
+            <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-black" />
           </div>
           <div className="relative container mx-auto px-4 z-10">
             <div className="max-w-2xl mx-auto text-center">
@@ -112,6 +157,7 @@ export default function AboutPage() {
               <div className="flex gap-4 mt-8 justify-center">
                 <Link
                   href="/movies"
+                  onClick={(e) => handleProtectedNavigate(e, "/movies")}
                   className="bg-red-600 text-white font-bold py-3 px-8 rounded-md hover:bg-red-700 transition-colors"
                 >
                   BROWSE MOVIES
@@ -146,9 +192,7 @@ export default function AboutPage() {
         </section>
 
         {/* Listing Section */}
-        <section
-          className="container mx-auto px-4 py-24 text-center"
-        >
+        <section className="container mx-auto px-4 py-24 text-center">
           <h3 className="text-4xl font-bold mb-4">TRENDING NOW</h3>
           <hr className="mx-auto text-red-500 w-1/12 mb-4" />
           <p className="text-gray-400 text-xl max-w-3xl mx-auto mb-16">
@@ -163,6 +207,7 @@ export default function AboutPage() {
           </div>
           <Link
             href="/"
+            onClick={(e) => handleProtectedNavigate(e, "/")}
             className="text-xl bg-red-600 text-white font-bold py-3 px-4 rounded-md hover:bg-red-700 transition-colors flex items-center gap-4 w-max mt-20 mx-auto animate-pulse"
           >
             See More{" "}
@@ -170,13 +215,13 @@ export default function AboutPage() {
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               stroke="currentColor"
               className="size-6"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3"
               />
             </svg>
@@ -199,28 +244,34 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-3 gap-12">
             <div className="bg-neutral-900 p-8 rounded-lg">
               <p className="text-red-500 text-5xl font-extrabold mb-4">01</p>
-              <h4 className="text-2xl font-bold mb-4 ">TOMATOETER & AUDIENCE SCORE</h4>
+              <h4 className="text-2xl font-bold mb-4 ">
+                TOMATOETER & AUDIENCE SCORE
+              </h4>
               <p className="text-gray-400">
-               Get a clear picture of a movie's quality with our aggregated "Tomatometer" score
-     from professional critics and the "Audience Score" from our user community.
+                Get a clear picture of a movie's quality with our aggregated
+                "Tomatometer" score from professional critics and the "Audience
+                Score" from our user community.
               </p>
             </div>
             <div className="bg-neutral-900 p-8 rounded-lg">
               <p className="text-red-500 text-5xl font-extrabold mb-4">02</p>
-              <h4 className="text-2xl font-bold mb-12">
-                READ & WRITE REVIEWS
-              </h4>
+              <h4 className="text-2xl font-bold mb-12">READ & WRITE REVIEWS</h4>
               <p className="text-gray-400">
-                Dive deep into reviews from a wide range of critics and users. Share your own take
-     and engage in lively discussions with fellow movie fans.
+                Dive deep into reviews from a wide range of critics and users.
+                Share your own take and engage in lively discussions with fellow
+                movie fans.
               </p>
             </div>
             <div className="bg-neutral-900 p-8 rounded-lg">
               <p className="text-red-500 text-5xl font-extrabold mb-4">03</p>
-              <h4 className="text-2xl font-bold mb-4"> YOUR PERSONAL MOVIE GUIDE </h4>
+              <h4 className="text-2xl font-bold mb-4">
+                {" "}
+                YOUR PERSONAL MOVIE GUIDE{" "}
+              </h4>
               <p className="text-gray-400">
-                Receive tailored recommendations based on your rating history and taste. Our
-     algorithm helps you discover hidden gems and movies you're sure to love.
+                Receive tailored recommendations based on your rating history
+                and taste. Our algorithm helps you discover hidden gems and
+                movies you're sure to love.
               </p>
             </div>
           </div>

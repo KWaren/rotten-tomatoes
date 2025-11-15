@@ -12,6 +12,8 @@ export default function FilterBar({
   onSearchChange,
   sortBy = "popularity.desc",
   onSortChange,
+  selectedDirector,
+  onDirectorChange,
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -26,12 +28,14 @@ export default function FilterBar({
     { value: "title.asc", label: "Title (A-Z)" },
   ];
 
-  const hasActiveFilters = selectedGenre || selectedYear || searchQuery;
+  const hasActiveFilters =
+    selectedGenre || selectedYear || searchQuery || selectedDirector;
 
   const resetFilters = () => {
     onGenreChange(null);
     onYearChange(null);
     onSearchChange("");
+    if (onDirectorChange) onDirectorChange("");
     if (onSortChange) onSortChange("popularity.desc");
   };
 
@@ -145,6 +149,26 @@ export default function FilterBar({
           </div>
         </div>
 
+        <div>
+          <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+            Director
+          </label>
+          <input
+            type="text"
+            placeholder="Director name..."
+            value={selectedDirector || ""}
+            onChange={(e) =>
+              onDirectorChange && onDirectorChange(e.target.value)
+            }
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+          />
+          {selectedDirector && (
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Director filter : "{selectedDirector}"
+            </p>
+          )}
+        </div>
+
         {onSortChange && (
           <div>
             <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
@@ -192,6 +216,11 @@ export default function FilterBar({
               {selectedYear && (
                 <span className="bg-white dark:bg-green-700 text-white dark:text-white px-2 py-1 rounded">
                   Year: {selectedYear}
+                </span>
+              )}
+              {selectedDirector && (
+                <span className="bg-white dark:bg-green-700 text-white dark:text-white px-2 py-1 rounded">
+                  Director: {selectedDirector}
                 </span>
               )}
             </div>

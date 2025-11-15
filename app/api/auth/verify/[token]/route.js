@@ -1,29 +1,29 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import prisma from '@/lib/prisma';
+import { NextResponse } from 'next/server';
 
 export async function GET(req, context) {
   const { token } = await context.params;
 
-  if (!token)
-    return NextResponse.json({ error: "Token missing" }, { status: 400 });
+  if (!token) {
+    const referer = req.headers.get('referer') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    return NextResponse.redirect(referer);
+  }
 
   const user = await prisma.user.findFirst({
     where: { verificationToken: token },
   });
 
-  if (!user)
-    return NextResponse.json(
-      { error: "Invalid or expired token" },
-      { status: 400 }
-    );
+  if (!user) {
+    const referer = req.headers.get('referer') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    return NextResponse.redirect(referer);
+  }
 
   await prisma.user.update({
     where: { id: user.id },
-    data: {
-      verified: true,
-      verificationToken: null,
-    },
+    data: { verified: true, verificationToken: null },
   });
 
-  return NextResponse.json({ message: "Email verified successfully!" });
+  const successUrl ='http://localhost:3000/login';
+
+  return NextResponse.redirect(successUrl);
 }

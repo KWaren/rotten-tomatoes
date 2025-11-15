@@ -1,26 +1,50 @@
 import MovieList from "@/components/movie/MovieList";
 import Link from "next/link";
+import prisma from "@/lib/prisma";
+import { cookies } from "next/headers";
+import { verifyToken } from "@/lib/jwt";
+import { redirect } from "next/navigation";
 
-async function getLocalMovies() {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/movies?page=1&limit=20`, {
-      cache: "no-store",
-    });
+async function getLocalMoviesFromDb() {
+  const movies = await prisma.movie.findMany({
+    take: 20,
+    orderBy: { voteCount: "desc" },
+  });
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch movies");
-    }
+  const normalized = movies.map((m) => ({
+    id: m.id,
+    title: m.title,
+    original_title: m.originalTitle,
+    originalTitle: m.originalTitle,
+    posterUrl: m.posterUrl,
+    backdropUrl: m.backdropUrl,
+    poster_path: null,
+    backdrop_path: null,
+    releaseDate: m.releaseDate ? m.releaseDate.toISOString() : null,
+    voteAverage: m.voteAverage ?? null,
+    vote_average: m.voteAverage ?? null,
+    voteCount: m.voteCount ?? 0,
+    vote_count: m.voteCount ?? 0,
+    genres: m.genres || [],
+  }));
 
-    return res.json();
-  } catch (error) {
-    console.error("Error fetching local movies:", error);
-    return { movies: [], total: 0 };
-  }
+  return { movies: normalized, total: normalized.length };
 }
 
 export default async function Home() {
-  const { movies } = await getLocalMovies();
+  try {
+    const cookieName = process.env.COOKIE_NAME || "sid";
+    const cookieStore = cookies();
+    const sid = cookieStore.get(cookieName)?.value;
+    const user = sid ? verifyToken(sid) : null;
+    if (!user) {
+      redirect("/about");
+    }
+  } catch (err) {
+    redirect("/about");
+  }
+
+  const { movies } = await getLocalMoviesFromDb();
 
   const popularMovies = movies.slice(0, 12);
 

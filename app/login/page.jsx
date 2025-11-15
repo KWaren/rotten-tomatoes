@@ -1,59 +1,95 @@
-"use client";
+'use client';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-import { signIn } from "next-auth/react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-
-export default function LoginPage() {
+export default function LoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
+
+    setError(''); 
+
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
     });
 
-    if (res?.error) setError(res.error);
-    else router.push("/");
+    const data = await res.json();
+
+    if (res.ok) {
+      router.push('/');
+    } else {
+      setError(data.error || 'Invalid credentials'); // <-- afficher dans la page
+    }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <form onSubmit={handleSubmit} className="p-6 bg-gray-100 rounded-lg w-80">
-        <h1 className="text-xl font-semibold mb-4 text-center">Connexion</h1>
+    <div
+      className="min-h-screen flex items-center justify-center bg-gray-50"
+      style={{
+        backgroundImage:
+          "url('https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=1470&q=80')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="max-w-md w-full bg-white/10 backdrop-blur-lg rounded-xl shadow-xl p-8 border border-white/20">
+        <h1 className="text-2xl font-bold text-center text-white mb-6">Login</h1>
 
-        {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="bg-red-100 border rounded-lg border-red-400 text-red-700  px-4 py-3 relative mt-4" role="alert">
+              <strong className="font-bold">Error :</strong>
+              <span className="block sm:inline ml-1">{error}</span>
+            </div>
+          )}
+          <div>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 bg-white/20 text-white border border-white/30 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none placeholder-white/70"
+              required
+            />
+          </div>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 mb-3 border rounded"
-          required
-        />
+          <div>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 bg-white/20 text-white border border-white/30 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none placeholder-white/70"
+              required
+            />
+          </div>
 
-        <input
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 mb-4 border rounded"
-          required
-        />
+          {/* {error && (
+            <p className="text-red-500 text-sm text-center">{error}</p> // <-- message d'erreur visible
+          )} */}
 
-        <button
-          type="submit"
-          className="bg-blue-500 text-white w-full p-2 rounded hover:bg-blue-600"
-        >
-          Se connecter
-        </button>
-      </form>
+          <button
+            type="submit"
+            className="w-full bg-red-500 text-white font-semibold py-2 rounded-lg hover:bg-red-600 transition duration-200"
+          >
+            Sign In
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-white mt-4">
+          Don’t have an account?{' '}
+          <Link href="/register" className="text-red-500 hover:underline font-medium">
+            Sign up
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
