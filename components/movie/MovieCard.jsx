@@ -42,6 +42,10 @@ export default function MovieCard({
   const releaseDate = movie.releaseDate || movie.release_date;
   const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : "N/A";
 
+  const isTMDBData = movie.vote_average !== undefined;
+  const rating = isTMDBData ? movie.vote_average : movie.averageRating;
+  const voteCount = isTMDBData ? movie.vote_count : movie._count?.ratings || 0;
+
   const handleAddMovie = async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -138,15 +142,13 @@ export default function MovieCard({
                   </svg>
                 </span>
                 <span className="font-medium text-gray-900 dark:text-white">
-                  {movie.averageRating && movie.averageRating > 0
-                    ? movie.averageRating.toFixed(1)
-                    : "N/A"}
+                  {rating && rating > 0 ? rating.toFixed(1) : "N/A"}
                 </span>
               </div>
             </div>
 
             <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              {movie._count?.ratings || 0} votes
+              {voteCount} votes
             </div>
           </div>
         </Link>
