@@ -355,7 +355,7 @@ export default function UsersPage() {
                 <label className="ml-2 text-sm">Active account</label>
               </div>
               <div className="mt-6 flex gap-3">
-                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 bg-gray-200 cursor-pointer hover:bg-gray-300 px-4 py-2 rounded-lg">
+                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 bg-white text-gray-600 cursor-pointer hover:bg-gray-300 px-4 py-2 rounded-lg">
                   Cancel
                 </button>
                 <button type="submit" className="flex-1 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
