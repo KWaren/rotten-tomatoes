@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -8,6 +8,27 @@ export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/me', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            router.push('/');
+            return;
+          }
+        }
+      } catch (err) {
+        console.log('User not logged in');
+      } finally {
+        setIsChecking(false);
+      }
+    };
+    checkAuth();
+  }, [router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,6 +49,14 @@ export default function LoginForm() {
       setError(data.error || 'Invalid credentials'); // <-- afficher dans la page
     }
   };
+
+  if (isChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div
