@@ -617,10 +617,60 @@
     },
     "/api/kpis": {
       "get": {
-        "summary": "Get public KPIs",
+        "summary": "Get dashboard KPIs (admin)",
+        "description": "Returns key performance indicators including user counts, movie counts, comments count, popular genres, and movies by age group",
         "responses": {
           "200": {
-            "description": "Key Performance Indicators"
+            "description": "Key Performance Indicators",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "verifiedUsersCount": {
+                      "type": "integer",
+                      "description": "Number of verified users"
+                    },
+                    "totalAccountsCount": {
+                      "type": "integer",
+                      "description": "Total number of user accounts"
+                    },
+                    "totalMoviesCount": {
+                      "type": "integer",
+                      "description": "Total number of movies"
+                    },
+                    "totalCommentsCount": {
+                      "type": "integer",
+                      "description": "Total number of comments"
+                    },
+                    "genresPopular": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "genre": {
+                            "type": "string"
+                          },
+                          "avgRating": {
+                            "type": "string"
+                          },
+                          "movieCount": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    },
+                    "moviesByAgeGroup": {
+                      "type": "object",
+                      "description": "Top 5 movies per age group",
+                      "additionalProperties": {
+                        "type": "array"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -656,6 +706,7 @@
     "/api/favorites": {
       "post": {
         "summary": "Toggle a movie as favorite",
+        "description": "Add or remove a movie from user favorites (toggle)",
         "security": [
           {
             "cookieAuth": []
@@ -666,14 +717,38 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FavoriteToggle"
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "integer"
+                  },
+                  "movieId": {
+                    "type": "integer"
+                  }
+                },
+                "required": ["userId", "movieId"]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Favorite status toggled"
+            "description": "Favorite status toggled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isFavorite": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
