@@ -4,14 +4,6 @@ import UpdateUserModal from "@/components/users/UpdateUserModal";
 import { useState, useEffect } from "react";
 
 export default function UsersPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-
-  const openModal = (user) => {
-    setSelectedUser(user);
-    setIsModalOpen(true);
-  };
-
   const [users, setUsers] = useState([]);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState([]);
@@ -20,13 +12,17 @@ export default function UsersPage() {
   const [roleFilter, setRoleFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
   const [showAddModal, setShowAddModal] = useState(false);
 
-  // Fields for new user
   const [newUser, setNewUser] = useState({
     name: "",
     surname: "",
     email: "",
+    profession: "",
+    birthday: "",
     password: "",
     role: "USER",
     verified: false,
@@ -52,11 +48,24 @@ export default function UsersPage() {
     loadUsers();
   }, []);
 
-  // Create user
+  // Open modal for editing user
+  const openModal = (user) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  // Create new user
   const createUser = async (e) => {
     e.preventDefault();
     setErrors([]);
     setMessage("");
+
+    // Validate birthday format
+    const birthdayRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (newUser.birthday && !birthdayRegex.test(newUser.birthday)) {
+      setErrors(["Birthday must be in the format YYYY-MM-DD"]);
+      return;
+    }
 
     try {
       const res = await fetch("/api/users", {
@@ -81,6 +90,8 @@ export default function UsersPage() {
         name: "",
         surname: "",
         email: "",
+        profession: "",
+        birthday: "",
         password: "",
         role: "USER",
         verified: false,
@@ -124,7 +135,7 @@ export default function UsersPage() {
   const adminCount = users.filter((u) => u.role === "ADMIN").length;
   const activeCount = users.filter((u) => u.verified).length;
 
-  // Filtering
+  // Filtering users
   const filteredUsers = users.filter((u) => {
     const matchesSearch =
       (u.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -146,7 +157,7 @@ export default function UsersPage() {
           <p className="text-green-800 font-medium">{message}</p>
           <button
             onClick={() => setMessage("")}
-            className="text-green-500 hover:text-green-700"
+            className="text-green-500 cursor-pointer hover:text-green-700"
           >
             ✕
           </button>
@@ -166,7 +177,7 @@ export default function UsersPage() {
           </div>
           <button
             onClick={() => setErrors([])}
-            className="text-red-500 hover:text-red-700"
+            className="text-red-500 cursor-pointer hover:text-red-700"
           >
             ✕
           </button>
@@ -184,7 +195,7 @@ export default function UsersPage() {
         <div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition"
+            className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition"
           >
             Add User
           </button>
@@ -197,12 +208,10 @@ export default function UsersPage() {
           <p className="text-sm text-gray-600 mb-1">Total Users</p>
           <h3 className="text-2xl font-bold text-gray-900">{users.length}</h3>
         </div>
-
         <div className="bg-white rounded-xl shadow-sm p-6">
           <p className="text-sm text-gray-600 mb-1">Administrators</p>
           <h3 className="text-2xl font-bold text-gray-900">{adminCount}</h3>
         </div>
-
         <div className="bg-white rounded-xl shadow-sm p-6">
           <p className="text-sm text-gray-600 mb-1">Active Users</p>
           <h3 className="text-2xl font-bold text-gray-900">{activeCount}</h3>
@@ -211,15 +220,13 @@ export default function UsersPage() {
 
       {/* SEARCH & FILTER */}
       <div className="bg-white rounded-xl shadow-sm p-6 mb-6 text-gray-800 flex flex-col md:flex-row gap-4">
-        <div className="flex-1">
-          <input
-            type="text"
-            placeholder="Search by name or email..."
-            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Search by name or email..."
+          className="flex-1 w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
         <select
           className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2"
@@ -248,102 +255,58 @@ export default function UsersPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
-                  User
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Email
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Role
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Status
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Created At
-                </th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase">
-                  Actions
-                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">User</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Email</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Role</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Created At</th>
+                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase">Actions</th>
               </tr>
             </thead>
-
             <tbody className="divide-y divide-gray-200">
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 bg-linear-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
-                          {user.name ? user.name[0].toUpperCase() : "U"}
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {user.name} {user.surname}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {user.profession || "N/A"}
-                          </p>
-                        </div>
+                    <td className="px-6 py-4 flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                        {user.name ? user.name[0].toUpperCase() : "U"}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{user.name} {user.surname}</p>
+                        <p className="text-sm text-gray-500">{user.profession || "N/A"}</p>
                       </div>
                     </td>
-
                     <td className="px-6 py-4 text-gray-700">{user.email}</td>
-
                     <td className="px-6 py-4">
-                      {user.role === "ADMIN" ? (
-                        <span className="px-3 py-1 rounded-full text-xs bg-purple-100 text-purple-800">
-                          Admin
-                        </span>
-                      ) : (
-                        <span className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-                          User
-                        </span>
-                      )}
+                      <span className={`px-3 py-1 rounded-full text-xs ${user.role === "ADMIN" ? "bg-purple-100 text-purple-800" : "bg-gray-100 text-gray-800"}`}>
+                        {user.role === "ADMIN" ? "Admin" : "User"}
+                      </span>
                     </td>
-
                     <td className="px-6 py-4">
-                      {user.verified ? (
-                        <span className="px-3 py-1 rounded-full text-xs bg-green-100 text-green-800">
-                          Active
-                        </span>
-                      ) : (
-                        <span className="px-3 py-1 rounded-full text-xs bg-red-100 text-red-800">
-                          Inactive
-                        </span>
-                      )}
+                      <span className={`px-3 py-1 rounded-full text-xs ${user.verified ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                        {user.verified ? "Active" : "Inactive"}
+                      </span>
                     </td>
-
-                    <td className="px-6 py-4 text-gray-600 text-sm">
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => openModal(user)}
-                          className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
-                        >
-                          Edit
-                        </button>
-
-                        <button
-                          onClick={() => deleteUser(user.id, user.name)}
-                          className="px-3 py-1 text-red-600 hover:bg-red-50 text-sm rounded-lg"
-                        >
-                          Delete
-                        </button>
-                      </div>
+                    <td className="px-6 py-4 text-gray-600 text-sm">{new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 flex justify-end gap-2">
+                      <button
+                        onClick={() => openModal(user)}
+                        className="px-3 py-1 cursor-pointer bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deleteUser(user.id, user.name)}
+                        className="px-3 py-1 cursor-pointer text-red-600 hover:bg-red-50 text-sm rounded-lg"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan="6"
-                    className="px-6 py-12 text-center text-gray-400"
-                  >
+                  <td colSpan="6" className="px-6 py-12 text-center text-gray-400">
                     No users found
                   </td>
                 </tr>
@@ -359,107 +322,43 @@ export default function UsersPage() {
         onClose={() => setIsModalOpen(false)}
         user={selectedUser}
         onUpdate={(updatedUser) => {
-          setUsers(
-            users.map((u) => (u.id === updatedUser.id ? updatedUser : u))
-          );
+          setUsers(users.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
         }}
       />
 
       {/* ADD USER MODAL */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center text-gray-800 justify-center p-4">
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
             <div className="p-6 border-b border-gray-200 flex items-center justify-between">
               <h3 className="text-xl font-bold">Add User</h3>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 cursor-pointer hover:text-gray-700"
               >
                 ✕
               </button>
             </div>
-
             <form className="p-6 space-y-4" onSubmit={createUser}>
-              <input
-                type="text"
-                placeholder="First Name"
-                className="w-full border rounded-lg px-4 py-2"
-                value={newUser.name}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, name: e.target.value })
-                }
-                required
-              />
-
-              <input
-                type="text"
-                placeholder="Last Name"
-                className="w-full border rounded-lg px-4 py-2"
-                value={newUser.surname}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, surname: e.target.value })
-                }
-                required
-              />
-
-              <input
-                type="email"
-                placeholder="Email"
-                className="w-full border rounded-lg px-4 py-2"
-                value={newUser.email}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, email: e.target.value })
-                }
-                required
-              />
-
-              <input
-                type="password"
-                placeholder="Password"
-                className="w-full border rounded-lg px-4 py-2"
-                value={newUser.password}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, password: e.target.value })
-                }
-                required
-              />
-
-              <select
-                className="w-full border rounded-lg px-4 py-2"
-                value={newUser.role}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, role: e.target.value })
-                }
-              >
+              <input type="text" placeholder="First Name" className="w-full border border-gray-500 rounded-lg px-4 py-2" value={newUser.name} onChange={(e) => setNewUser({ ...newUser, name: e.target.value })} required />
+              <input type="text" placeholder="Last Name" className="w-full border border-gray-500 rounded-lg px-4 py-2" value={newUser.surname} onChange={(e) => setNewUser({ ...newUser, surname: e.target.value })} required />
+              <input type="text" placeholder="Profession" className="w-full border border-gray-500 rounded-lg px-4 py-2" value={newUser.profession} onChange={(e) => setNewUser({ ...newUser, profession: e.target.value })} required />
+              <input type="date" placeholder="Birthdate YYYY-MM-DD" className="w-full border border-gray-500 rounded-lg px-4 py-2" value={newUser.birthday} onChange={(e) => setNewUser({ ...newUser, birthday: e.target.value })} required />
+              <input type="email" placeholder="Email" className="w-full border border-gray-500 rounded-lg px-4 py-2" value={newUser.email} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} required />
+              <input type="password" placeholder="Password" className="w-full border border-gray-500 rounded-lg px-4 py-2" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} required />
+              <select className="w-full border border-gray-500 rounded-lg px-4 py-2" value={newUser.role} onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}>
                 <option value="USER">User</option>
                 <option value="ADMIN">Admin</option>
               </select>
-
               <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4"
-                  checked={newUser.verified}
-                  onChange={(e) =>
-                    setNewUser({ ...newUser, verified: e.target.checked })
-                  }
-                />
+                <input type="checkbox" className="w-4 h-4" checked={newUser.verified} onChange={(e) => setNewUser({ ...newUser, verified: e.target.checked })} />
                 <label className="ml-2 text-sm">Active account</label>
               </div>
-
               <div className="mt-6 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="flex-1 bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg"
-                >
+                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 bg-gray-200 cursor-pointer hover:bg-gray-300 px-4 py-2 rounded-lg">
                   Cancel
                 </button>
-
-                <button
-                  type="submit"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-                >
+                <button type="submit" className="flex-1 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
                   Create
                 </button>
               </div>

@@ -77,7 +77,7 @@ export default function LoginForm() {
 
           <button
             type="submit"
-            className="w-full bg-red-500 text-white font-semibold py-2 rounded-lg hover:bg-red-600 transition duration-200"
+            className="w-full cursor-pointer bg-red-500 text-white font-semibold py-2 rounded-lg hover:bg-red-600 transition duration-200"
           >
             Sign In
           </button>

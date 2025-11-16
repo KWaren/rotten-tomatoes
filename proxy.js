@@ -22,7 +22,7 @@ const publicRoutes = [
 export async function proxy(req) {
   const { pathname } = req.nextUrl;
 
-  // 🔹 Exclure les fichiers statiques (Tailwind, images, JS, etc.)
+  //Pour exclure les fichiers statiques (Tailwind, images, JS, etc.)
   if (
     pathname.startsWith("/_next") || // Next.js internal files
     pathname.startsWith("/favicon.ico") || // favicon
@@ -43,10 +43,12 @@ export async function proxy(req) {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
+    // console.log(decoded);
 
-      if (pathname.startsWith("/admin") && decoded.role !== "ADMIN") {
-        console.warn("Non-admin trying to access admin route");
-        return NextResponse.redirect(new URL("/unauthorized", req.url));
+
+    if (pathname.startsWith("/admin") && decoded.role !== "ADMIN") {
+      console.warn("Non-admin trying to access admin route");
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
     }
 
     return NextResponse.next();

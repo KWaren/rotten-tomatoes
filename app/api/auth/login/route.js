@@ -36,10 +36,10 @@ export async function POST(req) {
       { expiresIn: "7d" }
     );
 
-    // 5️⃣ Supprime le mot de passe avant d'envoyer la réponse
+    // Supprime le mot de passe avant d'envoyer la réponse
     const { password: _, ...safeUser } = user;
 
-    // 6️⃣ Crée une réponse avec cookie
+    // Crée une réponse avec cookie
     const cookieName = process.env.COOKIE_NAME || "sid";
     const response = NextResponse.json({
       message: "Login successful",

@@ -52,11 +52,11 @@ export default function ProfilePage() {
       <AuthenticatedHeader />
 
       <main className="max-w-4xl mx-auto px-4 py-12">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden mb-8">
-          <div className="h-32 bg-linear-to-r from-red-600 to-yellow-500"></div>
+        <div className="bg-white dark:bg-gray-800 py-10 rounded-lg shadow-xl overflow-hidden mb-8">
+          {/* <div className="h-32 bg-linear-to-r from-red-600 to-yellow-500"></div> */}
 
           <div className="px-8 pb-8">
-            <div className="flex items-start -mt-16 mb-6">
+            {/* <div className="flex items-start -mt-16 mb-6">
               <div className="w-32 h-32 rounded-full bg-gray-700 border-4 border-white dark:border-gray-800 flex items-center justify-center shadow-lg">
                 <svg
                   className="w-16 h-16 text-gray-400"
@@ -70,7 +70,7 @@ export default function ProfilePage() {
                   />
                 </svg>
               </div>
-            </div>
+            </div> */}
 
             <div className="space-y-4">
               <div>
