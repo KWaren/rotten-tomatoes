@@ -13,8 +13,8 @@ export default function AdminLayout({ children }) {
   const linkClass = (href) =>
     `flex items-center space-x-3 px-4 py-3 rounded-lg transition font-medium ${
       pathname === href
-        ? "bg-blue-200 text-blue-600"
-        : "text-gray-700 hover:bg-gray-100"
+        ? "bg-gray-700 text-white"
+        : "text-gray-300 hover:bg-gray-700 hover:text-white"
     }`;
 
   // Fetch current user
@@ -50,14 +50,14 @@ export default function AdminLayout({ children }) {
   };
 
   return (
-    <div className="bg-gray-50 text-black min-h-screen">
+    <div className="bg-gray-900 text-white min-h-screen">
       {/* Navbar */}
-      <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
+      <nav className="bg-gray-800 shadow-lg fixed w-full top-0 z-50 border-b border-gray-700">
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-gray-600 hover:text-gray-900 lg:hidden"
+              className="text-gray-300 hover:text-white lg:hidden"
             >
               <svg
                 className="w-6 h-6"
@@ -73,19 +73,19 @@ export default function AdminLayout({ children }) {
                 />
               </svg>
             </button>
-            <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
+            <h1 className="text-xl font-bold text-white">Admin Panel</h1>
           </div>
 
           {/* User Menu */}
           {user && (
             <div
               onClick={handleProfileRedirect}
-              className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 rounded-lg px-3 py-2"
+              className="flex items-center space-x-2 cursor-pointer hover:bg-gray-700 rounded-lg px-3 py-2"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+              <div className="w-8 h-8 bg-linear-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
                 {user.name ? user.name[0].toUpperCase() : "U"}
               </div>
-              <span className="text-gray-700 font-medium hidden md:block">
+              <span className="text-gray-200 font-medium hidden md:block">
                 {user.name} {user.surname}
               </span>
             </div>
@@ -95,7 +95,7 @@ export default function AdminLayout({ children }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-full bg-white shadow-lg w-64 transform transition-transform duration-300 ease-in-out z-40 mt-14 ${
+        className={`fixed left-0 top-0 h-full bg-gray-800 shadow-lg w-64 transform transition-transform duration-300 ease-in-out z-40 mt-14 border-r border-gray-700 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
@@ -118,10 +118,10 @@ export default function AdminLayout({ children }) {
             </Link>
           </nav>
 
-          <div className="mt-8 pt-8 border-t border-gray-200">
+          <div className="mt-8 pt-8 border-t border-gray-700">
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-3 cursor-pointer px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition w-full text-left"
+              className="flex items-center space-x-3 cursor-pointer px-4 py-3 text-red-400 hover:bg-gray-700 hover:text-red-300 rounded-lg transition w-full text-left"
             >
               <span>Logout</span>
             </button>

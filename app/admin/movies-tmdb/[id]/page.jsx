@@ -2,6 +2,7 @@ import { get_movie_details } from "@/lib/tmdb";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import logo from "@/public/Logo.png";
 
 const getImageUrl = (path, size = "w500") => {
   if (!path) return "/default-Movie-image.jpg";

@@ -78,7 +78,7 @@ export default function AdminMoviesListPage() {
       <main className="container mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-            Import a movie
+            Our movies
           </h1>
           <div className="text-gray-600 dark:text-gray-400">
             {pagination.total} movie{pagination.total > 1 ? "s" : ""}
