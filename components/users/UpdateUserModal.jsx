@@ -57,14 +57,22 @@ export default function UpdateUserModal({ isOpen, onClose, user, onUpdate }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-lg">
-        <h2 className="text-xl font-semibold mb-4">
-          Modifier l’utilisateur : {user?.name}
-        </h2>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl w-full max-w-lg">
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+          <h3 className="text-xl font-bold">
+            Modifier l'utilisateur : {user?.name}
+          </h3>
+          <button
+            onClick={onClose}
+            className="text-gray-500 cursor-pointer hover:text-gray-700"
+          >
+            ✕
+          </button>
+        </div>
 
         {/* FORM */}
-        <form className="space-y-4" onSubmit={updateUser}>
+        <form className="p-6 space-y-4" onSubmit={updateUser}>
           
           {/* Name + Surname */}
           <input
@@ -154,13 +162,13 @@ export default function UpdateUserModal({ isOpen, onClose, user, onUpdate }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-200 hover:bg-gray-300 px-4 py-2 cursor-pointer rounded-lg"
+              className="flex-1 bg-white text-gray-600 cursor-pointer hover:bg-gray-300 px-4 py-2 rounded-lg"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white cursor-pointer px-4 py-2 rounded-lg"
+              className="flex-1 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
             >
               Update
             </button>
