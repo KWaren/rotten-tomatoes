@@ -31,7 +31,7 @@ export default function LogoutButton({ className = "" }) {
     <button
       onClick={handleLogout}
       disabled={isLoading}
-      className={`flex items-center gap-2 bg-gray-700 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`flex items-center gap-2 bg-gray-700 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
       {isLoading ? (
         "Logging out..."

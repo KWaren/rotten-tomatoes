@@ -117,7 +117,7 @@ export default function RegisterForm() {
         <button
           disabled={isSubmitting}
           type="submit"
-          className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-all"
+          className="w-full cursor-pointer bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-all"
         >
           {isSubmitting ? "Registering..." : "Register"}
         </button>
@@ -126,7 +126,7 @@ export default function RegisterForm() {
         Already have an account?{" "}
         <Link
           href="/login"
-          className="text-red-500 hover:underline font-medium"
+          className="text-red-500 cursor-pointer hover:underline font-medium"
         >
           Login
         </Link>
