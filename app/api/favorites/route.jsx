@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient()
-
+import { prismaDirect } from "@/lib/prisma";
 
 // Ajouter ou retirer un film des favoris
 export async function POST(request) {
@@ -20,13 +17,15 @@ export async function POST(request) {
     }
 
     // Vérifier si le film est déjà dans les favoris
-    const existing = await prisma.favorite.findFirst({
+    const existing = await prismaDirect.favorite.findFirst({
       where: { userId, movieId },
     });
 
     if (existing) {
       // Si oui, on le supprime (toggle off)
-      const result = await prisma.favorite.deleteMany({ where: { userId, movieId } });
+      const result = await prismaDirect.favorite.deleteMany({
+        where: { userId, movieId },
+      });
       return NextResponse.json({
         message: "Removed from favorites",
         isFavorite: false,
@@ -35,7 +34,7 @@ export async function POST(request) {
     }
 
     // Sinon, on le crée (toggle on)
-    const favorite = await prisma.favorite.create({
+    const favorite = await prismaDirect.favorite.create({
       data: { userId, movieId },
     });
 
@@ -47,7 +46,7 @@ export async function POST(request) {
     console.error("POST /favorites error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status : 500 }
+      { status: 500 }
     );
   }
 }
@@ -74,7 +73,7 @@ export async function POST(request) {
 //   } catch (error) {
 //     console.error("GET /favorites error:", error);
 //     return NextResponse.json(
-//       { error: "Internal server error" }, 
+//       { error: "Internal server error" },
 //       { status: 500 }
 //     );
 //   }
@@ -94,8 +93,8 @@ export async function POST(request) {
 //     }
 
 //     await prisma.favorite.delete({ where: { id } });
-//     return NextResponse.json({ 
-//       message: "Favorite deleted successfully" 
+//     return NextResponse.json({
+//       message: "Favorite deleted successfully"
 //     });
 //   } catch (error) {
 //     // Gestion spécifique si le favori n'existe pas
@@ -105,10 +104,10 @@ export async function POST(request) {
 //         { status: 404 }
 //       );
 //     }
-    
+
 //     console.error("DELETE /favorites error:", error);
 //     return NextResponse.json(
-//       { error: "Internal server error" }, 
+//       { error: "Internal server error" },
 //       { status: 500 }
 //     );
 //   }
