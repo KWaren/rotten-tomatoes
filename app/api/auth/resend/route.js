@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { sendVerificationEmail } from '@/lib/mailer';
 import { v4 as uuidv4 } from 'uuid';
 
-export async function POST(req: Request) {
+export async function POST(req) {
   const { email } = await req.json();
   if (!email) return NextResponse.json({ error: 'Email required' }, { status: 400 });
 

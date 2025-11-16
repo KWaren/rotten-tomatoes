@@ -10,7 +10,8 @@
     "lint": "eslint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "validate:openapi": "swagger-cli validate public/openapi.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -22,10 +23,12 @@
     "jsonwebtoken": "^9.0.2",
     "next": "16.0.1",
     "next-auth": "^4.24.13",
+    "next-swagger-doc": "^0.4.1",
     "nodemailer": "^7.0.10",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-hook-form": "^7.66.0",
+    "swagger-ui-react": "^5.30.2",
     "uuid": "^11.0.3",
     "zod": "^4.1.12"
   },

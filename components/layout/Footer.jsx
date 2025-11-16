@@ -2,7 +2,7 @@ export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white py-8 mt-16">
       <div className="container mx-auto px-4 text-center">
-        <p className="flex justify-center items-center gap-2 text-gray-400">
+        <p className="flex flex-col md:flex-row justify-center items-center gap-2 text-gray-400">
           © 2025 My Rotten Tomatoes - Made with
           <svg
             xmlns="http://www.w3.org/2000/svg"
