@@ -13,7 +13,6 @@ export default function UpdateUserModal({ isOpen, onClose, user, onUpdate }) {
     verified: false,
   });
 
-  // Remplir automatiquement les champs lorsque l'user est chargé
   useEffect(() => {
     if (user) {
       setFormData({
