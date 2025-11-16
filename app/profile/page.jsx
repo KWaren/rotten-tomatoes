@@ -194,9 +194,9 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
           <Link
             href="/favorites"
-            className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow flex items-center gap-4 group"
+            className="dark:bg-gray-800 rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow flex items-center gap-4 group"
           >
-            <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-lg group-hover:bg-red-200 dark:group-hover:bg-red-900/50 transition-colors">
+            <div className="p-3 rounded-lg group-hover:bg-red-200 dark:group-hover:bg-red-900/50 transition-colors">
               <svg
                 className="w-8 h-8 text-red-600"
                 fill="currentColor"
@@ -223,7 +223,7 @@ export default function ProfilePage() {
             href="/movies"
             className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow flex items-center gap-4 group"
           >
-            <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-lg group-hover:bg-yellow-200 dark:group-hover:bg-yellow-900/50 transition-colors">
+            <div className="p-3 rounded-lg group-hover:bg-yellow-200 dark:group-hover:bg-yellow-900/50 transition-colors">
               <svg
                 className="w-8 h-8 text-yellow-600"
                 fill="none"
