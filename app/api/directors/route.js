@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prismaDirect } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const movies = await prisma.movie.findMany({
+    const movies = await prismaDirect.movie.findMany({
       select: {
         director: true,
       },

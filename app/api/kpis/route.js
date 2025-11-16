@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prismaDirect } from "@/lib/prisma";
 
 // Fonction pour calculer l'âge à partir de la date de naissance (format String)
 function calculateAge(birthdayString) {
@@ -39,18 +37,21 @@ function getAgeGroup(age) {
 export async function GET(request) {
   try {
     // Nombre d'utilisateurs vérifiés
-    const verifiedUsersCount = await prisma.user.count({
+    const verifiedUsersCount = await prismaDirect.user.count({
       where: { verified: true },
     });
 
     // Nombre total de comptes créés
-    const totalAccountsCount = await prisma.user.count();
+    const totalAccountsCount = await prismaDirect.user.count();
 
     // Nombre de films disponibles sur la plateforme
-    const totalMoviesCount = await prisma.movie.count();
+    const totalMoviesCount = await prismaDirect.movie.count();
+
+    // Nombre total de commentaires
+    const totalCommentsCount = await prismaDirect.comment.count();
 
     // Genres les plus populaires (genre avec meilleure moyenne de notes)
-    const moviesWithRatings = await prisma.movie.findMany({
+    const moviesWithRatings = await prismaDirect.movie.findMany({
       include: {
         ratings: {
           select: { score: true },
@@ -88,7 +89,7 @@ export async function GET(request) {
 
     // Films populaires par tranche d'âge
     // Récupérer tous les utilisateurs avec leur anniversaire et leurs notes
-    const usersWithRatings = await prisma.user.findMany({
+    const usersWithRatings = await prismaDirect.user.findMany({
       include: {
         ratings: {
           include: {
@@ -147,6 +148,7 @@ export async function GET(request) {
       verifiedUsersCount,
       totalAccountsCount,
       totalMoviesCount,
+      totalCommentsCount,
       genresPopular,
       moviesByAgeGroup: popularMoviesByAgeGroup,
     });

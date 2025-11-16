@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prismaDirect } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -10,7 +10,7 @@ export async function POST(req) {
     const { email, password } = await req.json();
 
     //  Vérifie si l'utilisateur existe
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prismaDirect.user.findUnique({ where: { email } });
     if (!user)
       return NextResponse.json(
         { error: "Invalid credentials" },

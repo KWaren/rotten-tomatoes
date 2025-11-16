@@ -1,5 +1,5 @@
 import { verifyToken } from "@/lib/jwt";
-import prisma from "@/lib/prisma";
+import { prismaDirect } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET(req) {
@@ -16,7 +16,7 @@ export async function GET(req) {
     return NextResponse.json({ user: null });
   }
 
-  const user = await prisma.user.findUnique({
+  const user = await prismaDirect.user.findUnique({
     where: { id: decoded.id },
     select: {
       id: true,
