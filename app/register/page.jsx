@@ -1,6 +1,40 @@
+'use client';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import RegisterForm from "@/components/RegisterForm";
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/me', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            router.push('/');
+            return;
+          }
+        }
+      } catch (err) {
+        console.log('User not logged in');
+      } finally {
+        setIsChecking(false);
+      }
+    };
+    checkAuth();
+  }, [router]);
+
+  if (isChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600"></div>
+      </div>
+    );
+  }
+
   return (
     <main
       className="min-h-screen flex flex-col items-center justify-center p-6"

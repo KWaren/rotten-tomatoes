@@ -22,6 +22,8 @@ export default function MoviesPage() {
   const [selectedYear, setSelectedYear] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("popularity.desc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const loadGenres = async () => {
@@ -36,6 +38,10 @@ export default function MoviesPage() {
   }, []);
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedGenre, selectedYear, searchQuery, sortBy]);
+
+  useEffect(() => {
     setLoading(true);
 
     const fetchMovies = async () => {
@@ -43,14 +49,15 @@ export default function MoviesPage() {
         let data;
 
         if (searchQuery.trim()) {
-          data = await search_movies(searchQuery, 1);
+          data = await search_movies(searchQuery, currentPage);
         } else if (selectedGenre) {
-          data = await get_movies_by_genre(selectedGenre, 1);
+          data = await get_movies_by_genre(selectedGenre, currentPage);
         } else {
-          data = await get_popular_movies(1);
+          data = await get_popular_movies(currentPage);
         }
 
         let filteredMovies = data.results;
+        setTotalPages(data.total_pages > 500 ? 500 : data.total_pages);
 
         if (selectedYear) {
           filteredMovies = filteredMovies.filter((movie) => {
@@ -72,7 +79,7 @@ export default function MoviesPage() {
 
     const timer = setTimeout(fetchMovies, 10000);
     return () => clearTimeout(timer);
-  }, [selectedGenre, selectedYear, searchQuery, sortBy]);
+  }, [selectedGenre, selectedYear, searchQuery, sortBy, currentPage]);
 
   const sortMovies = (moviesList, sortOption) => {
     const sorted = [...moviesList];
@@ -170,12 +177,37 @@ export default function MoviesPage() {
                 </div>
               </div>
             ) : (
-              <MovieList
-                movies={movies}
-                title={searchQuery ? `Result for "${searchQuery}"` : undefined}
-                variant="admin"
-                basePath="/admin/movies-tmdb"
-              />
+              <>
+                <MovieList
+                  movies={movies}
+                  title={searchQuery ? `Result for "${searchQuery}"` : undefined}
+                  variant="admin"
+                  basePath="/admin/movies-tmdb"
+                />
+                
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex justify-center items-center gap-2 mt-8">
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-gray-700 dark:text-gray-300">
+                      Page {currentPage} / {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                      className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

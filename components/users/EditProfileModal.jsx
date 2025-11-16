@@ -2,17 +2,16 @@
 
 import { useState, useEffect } from "react";
 
-export default function UpdateUserModal({ isOpen, onClose, user, onUpdate }) {
+export default function EditProfileModal({ isOpen, onClose, user, onUpdate }) {
   const [formData, setFormData] = useState({
     name: "",
     surname: "",
     profession: "",
     birthday: "",
     email: "",
-    role: "USER",
-    verified: false,
   });
 
+  // Remplir automatiquement les champs lorsque l'user est chargé
   useEffect(() => {
     if (user) {
       setFormData({
@@ -21,15 +20,13 @@ export default function UpdateUserModal({ isOpen, onClose, user, onUpdate }) {
         profession: user.profession || "",
         birthday: user.birthday ? user.birthday.split("T")[0] : "",
         email: user.email || "",
-        role: user.role || "USER",
-        verified: user.verified || false,
       });
     }
   }, [user]);
 
   if (!isOpen) return null;
 
-  const updateUser = async (e) => {
+  const updateProfile = async (e) => {
     e.preventDefault();
 
     try {
@@ -41,17 +38,17 @@ export default function UpdateUserModal({ isOpen, onClose, user, onUpdate }) {
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) throw new Error("Failed to update");
+      if (!res.ok) throw new Error("Failed to update profile");
 
       const updated = await res.json();
-      alert("Utilisateur mis à jour !");
+      alert("Profile updated successfully!");
       onUpdate && onUpdate(updated);
       onClose();
       window.location.reload();
 
     } catch (err) {
       console.error(err);
-      alert("Erreur mise à jour");
+      alert("Error updating profile");
     }
   };
 
@@ -60,7 +57,7 @@ export default function UpdateUserModal({ isOpen, onClose, user, onUpdate }) {
       <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl w-full max-w-lg">
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <h3 className="text-xl font-bold">
-            Modifier l'utilisateur : {user?.name}
+            Edit My Profile
           </h3>
           <button
             onClick={onClose}
@@ -71,7 +68,7 @@ export default function UpdateUserModal({ isOpen, onClose, user, onUpdate }) {
         </div>
 
         {/* FORM */}
-        <form className="p-6 space-y-4" onSubmit={updateUser}>
+        <form className="p-6 space-y-4" onSubmit={updateProfile}>
           
           {/* Name + Surname */}
           <input
@@ -131,31 +128,6 @@ export default function UpdateUserModal({ isOpen, onClose, user, onUpdate }) {
             required
           />
 
-          {/* Role */}
-          <select
-            className="w-full border border-gray-500 rounded-lg px-4 py-2"
-            value={formData.role}
-            onChange={(e) =>
-              setFormData({ ...formData, role: e.target.value })
-            }
-          >
-            <option value="USER">User</option>
-            <option value="ADMIN">Admin</option>
-          </select>
-
-          {/* Verified */}
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              className="w-4 h-4"
-              checked={formData.verified}
-              onChange={(e) =>
-                setFormData({ ...formData, verified: e.target.checked })
-              }
-            />
-            <label className="ml-2 text-sm">Active account</label>
-          </div>
-
           {/* Buttons */}
           <div className="mt-6 flex gap-3">
             <button
@@ -169,7 +141,7 @@ export default function UpdateUserModal({ isOpen, onClose, user, onUpdate }) {
               type="submit"
               className="flex-1 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
             >
-              Update
+              Save Changes
             </button>
           </div>
         </form>
